@@ -28,6 +28,8 @@
   "scripts": {
     "build": "gatsby build",
     "develop": "gatsby develop",
+    "homepage": "https://hemphill86.github.io/ohsa",
+    "deploy": "gatsby build && gh-pages -d public -b master",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md}\"",
     "start": "npm run develop",
     "serve": "gatsby serve",
