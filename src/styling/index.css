@@ -11,6 +11,7 @@ body {
 
 #ohimg {
     height: 50vh;
+    max-height: 50vh;
 }
 
 #ngLink {
@@ -19,4 +20,5 @@ body {
 
 #ngImg {
     height: 10vh;
+    max-height: 10vh;
 }
