@@ -1,0 +1,8 @@
+#main {
+  display: grid;
+  place-items: center;
+}
+
+#icon {
+  height: 50vh;
+}

@@ -3,14 +3,13 @@ import { Link } from "gatsby"
 
 import Layout from "../components/layout"
 import SEO from "../components/seo"
+import icon from "../images/gatsby-icon.png"
+import "../styling/pg2.css"
 
 const SecondPage = () => (
-  <Layout>
-    <SEO title="Page two" />
-    <h1>Hi from the second page</h1>
-    <p>Welcome to page 2</p>
-    <Link to="/">Go back to the homepage</Link>
-  </Layout>
+  <div id="main">
+    <img id="icon" src={icon} alt="Gatsby Icon" />
+  </div>
 )
 
 export default SecondPage
