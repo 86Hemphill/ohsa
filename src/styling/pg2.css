@@ -1,6 +1,36 @@
 #main {
-  display: grid;
-  place-items: center;
+    display: grid;
+    place-items: center;
+    color: white;
+  }
+
+#form {
+    display: grid;
+    place-items: center;
+    color: white;
+}
+
+#addPlayers {
+    display: grid;
+    place-items: center;
+    color: white;
+    height: 15vh;
+    max-height: 15vh;
+}
+
+#nameInput {
+    height: 5vh;
+    width: 20vw;
+    max-height: 5vh;
+    margin-top: 2vh;
+    border-style: solid;
+    border-radius: 10px;
+}
+
+#addBtn {
+    margin-top: 2vh;
+    border-style: solid;
+    border-radius: 10px;
 }
 
 #icon {
