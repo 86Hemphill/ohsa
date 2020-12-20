@@ -16,10 +16,25 @@ import addPlayers from "../images/addPlayers.png"
       names: []
     }
 
+    // componentDidUpdate() {
+    //   const names = this.state.names.map((name) =>
+    //     <p class="names">{name}</p>
+    //   )
+    //   // const para = document.createElement("P");
+    //   // var t = document.createTextNode("This is a paragraph.");
+    //   // para.appendChild(t);
+    //   document.body.appendChild(names);
+    // }
+
     addPlayer = (e) => {
       e.preventDefault();
-      var nameInput = document.querySelector('#nameInput').value;
+      const nameInput = document.querySelector('#nameInput').value;
       this.state.names.push(nameInput);
+      const para = document.createElement("P");
+      para.className = "names";
+      const text = document.createTextNode(nameInput);
+      para.appendChild(text);
+      document.querySelector("#appendNames").appendChild(para);
       console.log(this.state.names);
       console.log(nameInput);
       document.querySelector('#nameInput').value = "";
@@ -30,9 +45,15 @@ import addPlayers from "../images/addPlayers.png"
         <div id="main">
           <form id="form">
             <img id="addPlayers" src={addPlayers} alt="Add Players"></img>
-            <input id="nameInput" type="text" name="firstName" />
-            <button id="addBtn" type="submit" onClick={this.addPlayer}>Submit</button>
-            <Link id="cardsLink" to="/cards"><button id="cards" type="submit">Next</button></Link>
+            <div id="inputLine">
+              <input id="nameInput" type="text" name="firstName" />
+              <button id="addBtn" onClick={this.addPlayer}>ADD</button>
+              <button id="cards" type="submit"><Link id="cardsLink" to="/cards">DONE</Link></button>
+            </div>
+            {/* Append name div */}
+            <div id="appendNames">
+
+            </div>
           </form>
         </div>
       )

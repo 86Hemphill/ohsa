@@ -1,57 +1,93 @@
-#main {
-    display: grid;
-    place-items: center;
-    color: white;
-  }
+/* #main {
+  display: grid;
+  place-items: center;
+  color: white;
+} */
 
 #form {
-    display: grid;
-    place-items: center;
-    color: white;
+  display: grid;
+  place-items: center;
+  color: white;
 }
 
 #addPlayers {
-    display: grid;
-    place-items: center;
-    color: white;
-    height: 15vh;
-    max-height: 15vh;
+  display: grid;
+  place-items: center;
+  color: white;
+  height: 15vh;
+  max-height: 15vh;
 }
 
 #nameInput {
-    height: 5vh;
-    width: 300px;
-    max-height: 5vh;
-    margin-top: 2vh;
-    border-style: solid;
-    border-radius: 10px;
+  height: 5vh;
+  width: 300px;
+  max-height: 5vh;
+  margin-top: 2vh;
+  border-style: solid;
+  border-radius: 10px;
 }
 
 #addBtn {
-    color: white;
-    margin-top: 2vh;
-    border-style: solid;
-    border-radius: 10px;
-    width: 100px;
-    height: 5vh;
+  margin-left: 10px;
+  background-color: white;
+  color: rgb(88, 194, 210);
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center;
+  border-style: solid;
+  border-radius: 10px;
+  border-color: white;
+  width: 75px;
+  height: 5vh;
 }
 
 #cards {
+  background-color: white;
+  margin-left: 10px;
+  border-style: solid;
+  border-radius: 10px;
+  border-color: white;
+  width: 75px;
+  height: 5vh;
+}
+
+#cardsLink {
+  color: rgb(88, 194, 210);
+  font-size: 18px;
+  /* text-shadow: .5px 0 0 rgb(0, 0, 0), -.5px 0 0 rgb(0, 0, 0), 0 .5px 0 rgb(0, 0, 0), 0 -.5px 0 rgb(0, 0, 0), .5px .5px rgb(0, 0, 0), -.5px -.5px 0 rgb(0, 0, 0), .5px -.5px 0 rgb(0, 0, 0), -.5px .5px 0 rgb(0, 0, 0); */
+  font-weight: bold;
+  text-decoration: none;
+  text-align: center;
+}
+
+#inputLine {
+    display: inline-flexbox;
+    text-align: center;
+}
+
+.names {
     margin-top: 2vh;
-    border-style: solid;
-    border-radius: 10px;
-    width: 100px;
-    height: 5vh;
-    color: white;
+    font-family: 'Bebas Neue', cursive;
+    font-size: 60px;
+    color: rgb(88, 194, 210);
+    text-align: center;
 }
 
-#cardsLink    {
-    color: white;
-    text-decoration: none;
-    height: 5vh;
-}
+@media only screen and (max-width: 768px) {
 
-#icon {
-  height: 50vh;
-  max-height: 50vh;
+    #main {
+        width: 100%;
+    }
+
+    #form {
+        width: 100%;
+    }
+
+    #addPlayers {
+        width: 100%;
+    }
+
+    #main {
+        width: 100%;
+    }
 }

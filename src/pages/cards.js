@@ -8,6 +8,7 @@ import icon from "../images/gatsby-icon.png"
 import "../styling/cards.css"
 import { render } from "react-dom"
 import addPlayers from "../images/addPlayers.png"
+import cards from "../images/cards.png"
 
 
   export default class Cards extends React.Component {
@@ -28,9 +29,9 @@ import addPlayers from "../images/addPlayers.png"
       return (
         <div id="main">
           <form id="form">
-            <h1>How Many Cards?</h1>
+            <img id="cardsImg" src={cards} alt="How Many Cards" />
             <input id="nameInput" type="text" name="firstName" />
-            <button id="addBtn" type="submit" onClick={this.addPlayer}>Start Game!</button>
+            <button id="startGame" type="submit" onClick={this.addPlayer}>Start Game!</button>
           </form>
         </div>
       )

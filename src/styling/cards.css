@@ -10,25 +10,17 @@
     color: white;
 }
 
-#addPlayers {
-    display: grid;
-    place-items: center;
-    color: white;
-    height: 15vh;
-    max-height: 15vh;
-}
-
 #nameInput {
     height: 5vh;
     width: 300px;
     max-height: 5vh;
-    margin-top: 1vh;
+    margin-top: 2vh;
     border-style: solid;
     border-radius: 10px;
 }
 
-#addBtn {
-    color: white;
+#startGame {
+    color: black;
     margin-top: 2vh;
     border-style: solid;
     border-radius: 10px;
@@ -36,21 +28,7 @@
     height: 5vh;
 }
 
-#cards {
-    margin-top: 2vh;
-    border-style: solid;
-    border-radius: 10px;
-    width: 100px;
-    height: 5vh;
-}
-
-#cardsLink    {
-    color: white;
-    text-decoration: none;
-    height: 5vh;
-}
-
-#icon {
-  height: 50vh;
-  max-height: 50vh;
+#cardsImg {
+    height: 15vh;
+    max-height: 15vh;
 }
