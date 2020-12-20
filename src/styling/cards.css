@@ -29,7 +29,8 @@
     border-style: solid;
     border-radius: 10px;
     border-color: white;
-    width: 20vw;
+    padding-left: 5px;
+    padding-right: 5px;
     height: 5vh;
 }
 
@@ -45,7 +46,7 @@
 }
 
 @media only screen and (orientation : landscape) {
-    button {
+    #startGame {
         height: 5vh;
     }
 }
