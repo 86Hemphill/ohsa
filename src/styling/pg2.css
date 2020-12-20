@@ -20,7 +20,7 @@
 
 #nameInput {
     height: 5vh;
-    width: 20vw;
+    width: 300px;
     max-height: 5vh;
     margin-top: 2vh;
     border-style: solid;
@@ -28,6 +28,7 @@
 }
 
 #addBtn {
+    color: white;
     margin-top: 2vh;
     border-style: solid;
     border-radius: 10px;
