@@ -12,7 +12,8 @@
 
 #nameInput {
     height: 5vh;
-    width: 300px;
+    width: 150px;
+    text-align: center;
     max-height: 5vh;
     margin-top: 2vh;
     border-style: solid;
@@ -28,7 +29,7 @@
     border-style: solid;
     border-radius: 10px;
     border-color: white;
-    width: 100px;
+    width: 20vw;
     height: 5vh;
 }
 
@@ -43,7 +44,7 @@
     }
 }
 
-@media only screen and (orientation : portrait) {
+@media only screen and (orientation : landscape) {
     button {
         height: 5vh;
     }
