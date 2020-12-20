@@ -20,10 +20,14 @@
 }
 
 #startGame {
-    color: black;
-    margin-top: 2vh;
+    background-color: white;
+    color: rgb(88, 194, 210);
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
     border-style: solid;
     border-radius: 10px;
+    border-color: white;
     width: 100px;
     height: 5vh;
 }
@@ -36,5 +40,11 @@
 @media only screen and (orientation : portrait) {
     #cardsImg {
         width: 100%;
+    }
+}
+
+@media only screen and (orientation : portrait) {
+    button {
+        height: 5vh;
     }
 }
