@@ -28,7 +28,7 @@
 }
 
 #addBtn {
-    color: black;
+    color: white;
     margin-top: 2vh;
     border-style: solid;
     border-radius: 10px;
@@ -45,7 +45,7 @@
 }
 
 #cardsLink    {
-    color: black;
+    color: white;
     text-decoration: none;
     height: 5vh;
 }
