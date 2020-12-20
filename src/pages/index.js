@@ -12,7 +12,7 @@ import GatsbyImage from "gatsby-image"
 const IndexPage = () => (
   <div id="main">
     <img id="ohimg" src={ohHell} alt="Oh Hell Logo" />
-    <Link id="ngLink" to="/page-2">
+    <Link id="ngLink" to="/players">
       <img id="ngImg" src={newGame} alt="New Game" />
     </Link>
     {/* <img id="ngimg" src={newGame} alt="New Game" /> */}
