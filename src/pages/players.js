@@ -16,16 +16,6 @@ import addBtn from "../images/addBtn.png"
       names: []
     }
 
-    // componentDidUpdate() {
-    //   const names = this.state.names.map((name) =>
-    //     <p class="names">{name}</p>
-    //   )
-    //   // const para = document.createElement("P");
-    //   // var t = document.createTextNode("This is a paragraph.");
-    //   // para.appendChild(t);
-    //   document.body.appendChild(names);
-    // }
-
     addPlayer = (e) => {
       e.preventDefault();
       const nameInput = document.querySelector('#nameInput').value;
@@ -48,7 +38,7 @@ import addBtn from "../images/addBtn.png"
             <div id="inputLine">
               <input id="nameInput" type="text" name="firstName" />
               <button id="addBtn" onClick={this.addPlayer}>ADD</button>
-              <button id="cards" type="submit"><Link id="cardsLink" to="/cards">DONE</Link></button>
+              <button id="cards" type="submit"><Link id="cardsLink" to="/cards" state={this.state}>DONE</Link></button>
             </div>
             {/* Append name div */}
             <div id="appendNames">
