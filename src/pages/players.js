@@ -4,10 +4,10 @@ import { Link } from "gatsby"
 
 import Layout from "../components/layout"
 import SEO from "../components/seo"
-import icon from "../images/gatsby-icon.png"
 import "../styling/players.css"
 import { render } from "react-dom"
 import addPlayers from "../images/addPlayers.png"
+import addBtn from "../images/addBtn.png"
 
 
   export default class PLAYERS extends React.Component {
