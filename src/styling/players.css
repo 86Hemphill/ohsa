@@ -4,6 +4,13 @@
   color: white;
 } */
 
+input:focus,
+select:focus,
+textarea:focus,
+button:focus {
+    outline: none;
+  }
+
 #form {
   display: grid;
   place-items: center;
@@ -37,7 +44,8 @@
   border-style: solid;
   border-radius: 10px;
   border-color: white;
-  width: 75px;
+  padding-left: 5px;
+  padding-right: 5px;
   height: 5vh;
 }
 
@@ -47,7 +55,8 @@
   border-style: solid;
   border-radius: 10px;
   border-color: white;
-  width: 75px;
+  padding-left: 5px;
+  padding-right: 5px;
   height: 5vh;
 }
 

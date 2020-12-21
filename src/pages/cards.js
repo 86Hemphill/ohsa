@@ -14,12 +14,12 @@ import cards from "../images/cards.png"
   export default class Cards extends React.Component {
 
     state = {
-      names: []
+      cards: ""
     }
 
-    addPlayer = (e) => {
+    selectCards = (e) => {
       e.preventDefault();
-      let nameInput = document.querySelector('#nameInput').value;
+      let nameInput = document.querySelector('#cardAmt').value;
       this.state.names.push(nameInput);
       console.log(this.state.names)
       console.log(nameInput);
@@ -30,8 +30,8 @@ import cards from "../images/cards.png"
         <div id="main">
           <form id="form">
             <img id="cardsImg" src={cards} alt="How Many Cards" />
-            <input id="nameInput" type="text" name="firstName" />
-            <button id="startGame" type="submit" onClick={this.addPlayer}>Start Game!</button>
+            <input id="cardAmt" type="text" />
+            <button id="startGame" type="submit" onClick={this.selectCards}>Start Game!</button>
           </form>
         </div>
       )

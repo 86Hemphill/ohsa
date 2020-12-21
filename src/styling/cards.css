@@ -4,13 +4,20 @@
     color: white;
   }
 
+input:focus,
+select:focus,
+textarea:focus,
+button:focus {
+    outline: none;
+  }
+
 #form {
     display: grid;
     place-items: center;
     color: white;
 }
 
-#nameInput {
+#cardAmt {
     height: 5vh;
     width: 150px;
     text-align: center;
@@ -23,6 +30,7 @@
 #startGame {
     background-color: white;
     color: rgb(88, 194, 210);
+    margin-top: 2vh;
     font-size: 18px;
     font-weight: bold;
     text-align: center;

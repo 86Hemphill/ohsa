@@ -9,6 +9,13 @@ body {
     place-items: center;
 }
 
+input:focus,
+select:focus,
+textarea:focus,
+button:focus {
+    outline: none;
+  }
+
 #ohimg {
     height: 50vh;
     max-height: 50vh;
