@@ -23,12 +23,15 @@ import cards from "../images/cards.png"
         this.setState({
             names: {names}
         })
+        console.log(this.state.names);
     }
 
     selectCards = (e) => {
       e.preventDefault();
       let cardAmt = document.querySelector('#cardAmt').value;
       this.state.cards.push(cardAmt);
+      console.log(this.state.names);
+      console.log(this.state.cards);
     }
 
     render() {
@@ -37,7 +40,7 @@ import cards from "../images/cards.png"
           <form id="form">
             <img id="cardsImg" src={cards} alt="How Many Cards" />
             <input id="cardAmt" type="text" />
-            <button id="startGame" type="submit" onClick={this.selectCards}>Start Game!</button>
+            <Link  to="/scoreboard" state={this.state}><button id="startGame" type="submit" onClick={this.selectCards}>Start Game!</button></Link>
           </form>
         </div>
       )
