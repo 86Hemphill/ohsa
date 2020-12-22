@@ -14,24 +14,30 @@ import cards from "../images/cards.png"
   export default class Cards extends React.Component {
 
     state = {
-      names: [],
+      names: this.props.location.state.names,
+      hands: [],
       cards: []
     }
 
-    componentDidMount() {
-        const names = this.props.location.state.names;
-        this.setState({
-            names: {names}
-        })
-        console.log(this.state.names);
+    selectCards = (e) => {
+    //   e.preventDefault();
+      let cardAmt = document.querySelector('#cardAmt').value;
+      this.state.hands.push(cardAmt);
+      this.setCards(cardAmt);
+      console.log(this.state.names);
+      console.log(this.state.hands);
     }
 
-    selectCards = (e) => {
-      e.preventDefault();
-      let cardAmt = document.querySelector('#cardAmt').value;
-      this.state.cards.push(cardAmt);
-      console.log(this.state.names);
-      console.log(this.state.cards);
+    setCards = (x) => {
+        for (let i = x; i >= 0; i--) {
+            if (i === 0) {
+                for (let i = 1; i <= x; i++) {
+                    this.state.cards.push(i);
+                }
+            }  
+            this.state.cards.push(i);
+        }
+        this.state.cards.pop();
     }
 
     render() {

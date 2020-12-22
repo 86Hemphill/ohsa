@@ -25,8 +25,6 @@ import addBtn from "../images/addBtn.png"
       const text = document.createTextNode(nameInput);
       para.appendChild(text);
       document.querySelector("#appendNames").appendChild(para);
-      console.log(this.state.names);
-      console.log(nameInput);
       document.querySelector('#nameInput').value = "";
     }
 
