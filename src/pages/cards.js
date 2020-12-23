@@ -37,6 +37,7 @@ import cards from "../images/cards.png"
             }  
             this.state.cards.push(i);
         }
+        this.state.cards[0] = parseInt(this.state.cards[0]);
         this.state.cards.pop();
     }
 

@@ -26,16 +26,21 @@ import { render } from "react-dom"
             <table>
                 <thead>
                     <tr>
-                        <th>Column1</th>
-                        <th>Column2</th>
-                        <th>Column3</th>
+                        <th></th>
+                        {this.state.cards.map((card, i) => (
+                        <th key={i} className="cardNumbers">{card}</th>
+                        ))}
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>{this.props.location.state.names[0]}</td>
-                        <td>{this.props.location.state.hands[0]}</td>
-                    </tr>
+                    {this.state.names.map((name, i) => (
+                        <tr>
+                            <td key={i} className="names">{name}</td>,
+                            {this.state.cards.map((card, i) => (
+                                <td key={i} className="tricks"></td>
+                            ))}
+                        </tr>
+                    ))}
                 </tbody>
         </table>
         </div>
