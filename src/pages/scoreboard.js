@@ -1,13 +1,12 @@
 import React from "react"
 import { Link } from "gatsby"
-import { useTable } from 'react-table'
-
 
 import Layout from "../components/layout"
 import SEO from "../components/seo"
 import icon from "../images/gatsby-icon.png"
 import "../styling/scoreboard.css"
 import { render } from "react-dom"
+import Table from "../components/table"
   
 
   export default class Cards extends React.Component {
@@ -43,6 +42,8 @@ import { render } from "react-dom"
                     ))}
                 </tbody>
         </table>
+        {/* <Table>
+        </Table> */}
         </div>
       )
     }
