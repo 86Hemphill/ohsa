@@ -11,10 +11,19 @@ export default class Cards extends React.Component {
     super(props)
 
     this.state = {
-      names: this.props.location.state.names,
-      hands: this.props.location.state.hands,
-      cards: this.props.location.state.cards,
+        names: [],
+        hands: [],
+        cards: []
     }
+  }
+
+  componentDidMount() {
+    if (typeof window === "undefined") {
+      return
+    }
+    this.setState(() => ({ names: this.props.location.state.names }))
+    this.setState(() => ({ hands: this.props.location.state.hands }))
+    this.setState(() => ({ cards: this.props.location.state.cards }))
   }
 
   setBid = () => {
