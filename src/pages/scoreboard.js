@@ -3,48 +3,53 @@ import { Link } from "gatsby"
 
 import Layout from "../components/layout"
 import SEO from "../components/seo"
-import icon from "../images/gatsby-icon.png"
 import "../styling/scoreboard.css"
-import { render } from "react-dom"
-import Table from "../components/table"
-  
 
-  export default class Cards extends React.Component {
 
-    state = {
+export default class Cards extends React.Component {
+  constructor(props) {
+    super(props)
+
+    this.state = {
       names: this.props.location.state.names,
       hands: this.props.location.state.hands,
-      cards: this.props.location.state.cards
-    }
-
-
-    render() {
-        console.log(this.state.cards);
-      return (
-        <div id="main">
-            <table>
-                <thead>
-                    <tr>
-                        <th></th>
-                        {this.state.cards.map((card, i) => (
-                        <th key={i} className="cardNumbers">{card}</th>
-                        ))}
-                    </tr>
-                </thead>
-                <tbody>
-                    {this.state.names.map((name, i) => (
-                        <tr>
-                            <td key={i} className="names">{name}</td>,
-                            {this.state.cards.map((card, i) => (
-                                <td key={i} className="tricks"></td>
-                            ))}
-                        </tr>
-                    ))}
-                </tbody>
-        </table>
-        {/* <Table>
-        </Table> */}
-        </div>
-      )
+      cards: this.props.location.state.cards,
     }
   }
+
+  setBid = () => {
+    //
+  }
+
+  render() {
+    return (
+      <div id="main">
+        <table>
+          <thead>
+            <tr>
+                <th>
+                </th>
+              {this.state.names.map((name, i) => (
+                <th key={i} className="playerNames">
+                  {name}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {this.state.cards.map((card, i) => (
+              <tr key={i}>
+                <td className="cardNumbers">
+                  {card}
+                </td>
+                {this.state.names.map((name, i) => (
+                  <td key={i} className="tricks" onClick={() => this.setBid(name)}></td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    )
+  }
+}

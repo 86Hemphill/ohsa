@@ -8,49 +8,55 @@ import icon from "../images/gatsby-icon.png"
 import "../styling/cards.css"
 import { render } from "react-dom"
 import addPlayers from "../images/addPlayers.png"
-import cards from "../images/cards.png"
+import cardsImg from "../images/cardsImg.png"
 
-
-  export default class Cards extends React.Component {
-
-    state = {
-      names: this.props.location.state.names,
-      hands: [],
-      cards: []
-    }
-
-    selectCards = (e) => {
-    //   e.preventDefault();
-      let cardAmt = document.querySelector('#cardAmt').value;
-      this.state.hands.push(cardAmt);
-      this.setCards(cardAmt);
-      console.log(this.state.names);
-      console.log(this.state.hands);
-    }
-
-    setCards = (x) => {
-        for (let i = x; i >= 0; i--) {
-            if (i === 0) {
-                for (let i = 1; i <= x; i++) {
-                    this.state.cards.push(i);
-                }
-            }  
-            this.state.cards.push(i);
-        }
-        this.state.cards[0] = parseInt(this.state.cards[0]);
-        this.state.cards.pop();
-    }
-
-    render() {
-      return (
-        <div id="main">
-          <form id="form">
-            <img id="cardsImg" src={cards} alt="How Many Cards" />
-            <input id="cardAmt" type="text" />
-            <Link  to="/scoreboard" state={this.state}><button id="startGame" type="submit" onClick={this.selectCards}>Start Game!</button></Link>
-          </form>
-        </div>
-      )
-    }
+export default class Cards extends React.Component {
+  state = {
+    names: this.props.location.state.names,
+    hands: [],
+    cards: [],
+    cardAmt: "",
   }
 
+  setCardAmt = e => {
+    const { name, value } = e.target
+    this.setState({ [name]: value })    
+    this.setCards(value);
+  }
+
+  setCards = x => {
+    const cards = []
+    for (let i = x; i >= 0; i--) {
+      if (i === 0) {
+        for (let j = 1; j <= x; j++) {
+          cards.push(j)
+        }
+      } else {
+        cards.push(i)
+      }
+    }
+    this.setState({ cards: cards })
+  }
+
+  render() {
+    return (
+      <div id="main">
+        <form id="form">
+          <img id="cardsImg" src={cardsImg} alt="How Many Cards" />
+          <input
+            id="cardAmt"
+            type="text"
+            name="cardAmt"
+            value={this.state.cardAmt}
+            onChange={this.setCardAmt}
+          />
+          <Link to="/scoreboard" state={this.state}>
+            <button id="startGame" type="submit">
+              Start Game!
+            </button>
+          </Link>
+        </form>
+      </div>
+    )
+  }
+}

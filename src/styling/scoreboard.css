@@ -1,3 +1,7 @@
+body::-webkit-scrollbar {
+        display: none;
+}
+
 #main {
     width: 100vw;
     height: 100vh;
@@ -5,7 +9,7 @@
 
 table {
     width: 100vw;
-    /* height: 100%; */
+    height: 100%;
     background-color: white;
     border-style: solid;
     border-width: 5px;
@@ -15,7 +19,10 @@ table {
  }
 
 .cardNumbers {
-    height: 10vh;
+    text-align: center;
+    font-size: 24px;
+    height: 5vh !important;
+    width: 3vw !important;
     border-style: solid;
     border-width: 2px;
     border-color: white;
@@ -23,8 +30,14 @@ table {
     background-color: black;
 }
 
-.names {
-    width: 10%;
+.playerNames {
+    width: 10vw;
+    font-size: 48px;
+    font-family: 'Bebas Neue', cursive;
+    border-style: solid;
+    border-width: 2px;
+    border-color: white;
+    border-radius: 8px;
     background-color: black;
 }
 
