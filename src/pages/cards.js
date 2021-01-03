@@ -11,12 +11,16 @@ import addPlayers from "../images/addPlayers.png"
 import cardsImg from "../images/cardsImg.png"
 
 export default class Cards extends React.Component {
-  state = {
-    names: this.props.location.state.names,
-    hands: [],
-    cards: [],
-    cardAmt: "",
-  }
+    constructor(props) {
+        super(props)
+  
+        this.state = {
+            names: this.props.location.state.names,
+            hands: [],
+            cards: [],
+            cardAmt: "",
+        }
+      }
 
   setCardAmt = e => {
     const { name, value } = e.target

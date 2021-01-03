@@ -11,9 +11,13 @@ import addBtn from "../images/addBtn.png"
 
 
   export default class PLAYERS extends React.Component {
+    constructor(props) {
+      super(props)
 
-    state = {
-      names: []
+      this.state = {
+        names: []
+      }
+    
     }
 
     addPlayer = (e) => {
