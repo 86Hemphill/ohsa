@@ -16,6 +16,7 @@ export default class Cards extends React.Component {
 
     this.state = {
       names: [],
+      players: [],
       hands: [],
       cards: [],
       cardAmt: "",
@@ -27,6 +28,19 @@ export default class Cards extends React.Component {
       return
     }
     this.setState(() => ({ names: this.props.location.state.names }))
+    let players = [...this.state.players]
+    this.props.location.state.names.map((player, i) => (
+      players.push(
+      {
+        index: i,
+        name: player,
+        hand: null,
+        bid: null,
+        total: null
+      },
+    )))
+    console.log(players);
+    this.setState({ players })
   }
 
   setCardAmt = e => {
