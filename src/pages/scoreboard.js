@@ -26,17 +26,6 @@ export default class Cards extends React.Component {
     this.setState(() => ({ hands: this.props.location.state.hands }))
     this.setState(() => ({ cards: this.props.location.state.cards }))
     this.setState(() => ({ players: this.props.location.state.players }))
-
-    // const players = this.state.names.map((player, i) => (
-    //   {
-    //     index: i,
-    //     name: player,
-    //     hand: null,
-    //     bid: null,
-    //     total: null
-    //   }
-    // ))
-    // this.setState({ players: players })
   }
 
   setBid = () => {
