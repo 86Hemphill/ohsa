@@ -1,74 +1,55 @@
 # OHSA — Oh Hell Score App
 
-A Gatsby-based web app for tracking scores in the card game **Oh Hell**, designed to be usable on mobile devices.
+A web app for tracking scores in the card game **Oh Hell**, designed to be usable on mobile devices.
 
 [![Netlify Status](https://api.netlify.com/api/v1/badges/9f2fd6dd-769a-49f0-a8b4-eb1c8390b29d/deploy-status)](https://app.netlify.com/sites/ohhell/deploys)
 
-## What exists today
+## Current status
 
-The current app already has the core flow scaffolded:
+This repo includes the original flow scaffold:
 
-1. **Landing screen**
-2. **Add players**
-3. **Choose card count**
-4. **Render scoreboard grid**
+1. Landing screen
+2. Add players
+3. Choose card count
+4. Scoreboard grid shell
 
-Pages live under `src/pages` and route in this order:
+Routes:
 
-- `/` → `index.js`
-- `/players` → `players.js`
-- `/cards` → `cards.js`
-- `/scoreboard` → `scoreboard.js`
+- `/` → `src/pages/index.js`
+- `/players` → `src/pages/players.js`
+- `/cards` → `src/pages/cards.js`
+- `/scoreboard` → `src/pages/scoreboard.js`
 
-## Current limitations (from a quick code review)
+## Phase 1 (started): stabilize core game logic
 
-- Uses an older Gatsby/React stack (`gatsby@2`, `react@16`).
-- Several starter-template leftovers still exist in metadata/config.
-- Player entry and score interactions mix React with direct DOM manipulation.
-- Scoreboard interaction logic is not implemented yet (`setBid` is stubbed).
-- No automated tests are configured.
+### ✅ Implemented in this phase so far
 
-## Getting started locally
+- Added a **framework-agnostic scoring engine** in `src/game/scoring.js`.
+- Added **automated tests** in `test/scoring.test.js` using Node's built-in test runner.
+- Updated `npm test` to run the scoring tests.
 
-```bash
-npm install
-npm run develop
-```
+Current scoring rule implemented:
 
-Then open: `http://localhost:8000/ohsa/`
+- Exact bid: `10 + bid`
+- Missed bid: `-abs(bid - tricks)`
 
-## Suggested roadmap
+## Framework recommendation (if we move off Gatsby)
 
-### Phase 1 — Stabilize the current app
+If we want a modern, relevant framework today, I recommend **Next.js (App Router) + TypeScript**.
 
-- Remove starter-template leftovers and clean imports/components.
-- Replace direct DOM mutation with React state updates.
-- Add validation (blank player names, duplicate names, invalid card count).
-- Implement editable bids/tricks and round scoring rules.
-- Persist game state in local storage.
+Why:
 
-### Phase 2 — Mobile-first polish
+- Large ecosystem and long-term support.
+- Excellent mobile/web performance defaults.
+- Easy deployment options (Vercel, Netlify, Docker, etc.).
+- Great fit if we later add auth, sync, or multiplayer features.
 
-- Improve responsive table UX (sticky player headers, larger touch targets).
-- Add game setup presets and quick actions for common player counts.
-- Add “new game”, “resume game”, and “undo last change”.
+If you want a lighter SPA-only stack, **Vite + React + TypeScript** is also a strong option.
 
-### Phase 3 — Modernize tech stack
+## Next concrete steps
 
-- Upgrade to a modern framework baseline (new Gatsby or Next.js + React 18/19).
-- Add TypeScript, linting, formatter, and CI checks.
-- Add unit tests for scoring logic and e2e tests for game flow.
-
-## Great "opening act" ideas for Codex
-
-If you want to use this as your first Codex showcase, these are high-impact and realistic:
-
-1. **Implement complete Oh Hell scoring engine** as pure functions + tests.
-2. **Refactor UI flow to modern React hooks** and remove manual DOM updates.
-3. **Add save/resume game from localStorage**.
-4. **Ship a polished mobile scoreboard** with tap-to-edit interactions.
-5. **Deploy a refreshed version** and add a short changelog.
-
----
-
-If you want, the next Codex step can be: **“Build Phase 1 in small PRs”**, starting with scoring logic + tests first.
+1. Wire `src/game/scoring.js` into the scoreboard UI.
+2. Replace manual DOM mutations in `players.js` with React state updates.
+3. Add localStorage persistence (resume last game).
+4. Add input validation (duplicate names, blank names, invalid round/card values).
+5. Start migration branch to Next.js or Vite once behavior is stable.
