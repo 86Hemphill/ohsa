@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import HomeActions from './home-actions'
 
 export default function HomePage() {
   return (
@@ -6,9 +6,7 @@ export default function HomePage() {
       <div className="card hero">
         <h1>OHSA</h1>
         <p>Track your Oh Hell games on mobile.</p>
-        <Link href="/players" className="button primary">
-          Start New Game
-        </Link>
+        <HomeActions />
       </div>
     </main>
   )

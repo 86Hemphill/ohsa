@@ -2,6 +2,8 @@ const test = require('node:test')
 const assert = require('node:assert/strict')
 
 const {
+  SCORING_METHODS,
+  DEFAULT_RULES,
   DEFAULT_SCORING_CONFIG,
   calculatePlayerRoundScore,
   calculateRoundScores,
@@ -13,9 +15,18 @@ test('calculatePlayerRoundScore gives bonus+bid when bid is exact', () => {
   assert.equal(score, DEFAULT_SCORING_CONFIG.exactBonus + 3)
 })
 
-test('calculatePlayerRoundScore applies per-trick miss penalty', () => {
+test('classic scoring awards tricks taken on a missed bid', () => {
   const score = calculatePlayerRoundScore({ bid: 4, tricks: 1 })
-  assert.equal(score, -3)
+  assert.equal(score, 1)
+})
+
+test('competitive scoring penalizes missed bids by 10 per trick off', () => {
+  const score = calculatePlayerRoundScore({
+    bid: 4,
+    tricks: 1,
+    rules: { scoringMethod: SCORING_METHODS.COMPETITIVE },
+  })
+  assert.equal(score, -30)
 })
 
 test('calculateRoundScores returns round and running totals', () => {
@@ -35,8 +46,8 @@ test('calculateRoundScores returns round and running totals', () => {
       tricks: 2,
     },
     Bo: {
-      roundScore: -1,
-      total: 1,
+      roundScore: 0,
+      total: 2,
       bid: 1,
       tricks: 0,
     },
@@ -61,9 +72,30 @@ test('buildScoreboard computes totals across multiple rounds', () => {
 
   assert.deepEqual(board.totals, {
     Ava: 21,
-    Bo: 11,
+    Bo: 12,
   })
   assert.equal(board.rounds.length, 2)
+})
+
+test('buildScoreboard supports competitive scoring rules', () => {
+  const board = buildScoreboard({
+    players: ['Ava', 'Bo'],
+    rounds: [
+      {
+        bids: { Ava: 2, Bo: 1 },
+        tricks: { Ava: 1, Bo: 2 },
+      },
+    ],
+    rules: {
+      ...DEFAULT_RULES,
+      scoringMethod: SCORING_METHODS.COMPETITIVE,
+    },
+  })
+
+  assert.deepEqual(board.totals, {
+    Ava: -10,
+    Bo: -10,
+  })
 })
 
 test('buildScoreboard throws when round input is missing players', () => {

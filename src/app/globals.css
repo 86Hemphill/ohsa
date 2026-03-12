@@ -39,9 +39,26 @@ body {
   gap: 0.75rem;
 }
 
+.stack.compact {
+  gap: 0.5rem;
+}
+
+.wideStack {
+  width: min(960px, 100%);
+}
+
 .row {
   display: flex;
   gap: 0.5rem;
+}
+
+.row.split {
+  justify-content: space-between;
+  align-items: start;
+}
+
+.row.wrap {
+  flex-wrap: wrap;
 }
 
 .input {
@@ -69,8 +86,80 @@ body {
   text-align: center;
 }
 
+.button.secondary {
+  background: #1e293b;
+  color: #e2e8f0;
+  text-decoration: none;
+  text-align: center;
+}
+
+.button.danger {
+  background: #7f1d1d;
+}
+
 .error {
   color: #fda4af;
+}
+
+.panel {
+  background: #111827;
+  border: 1px solid #334155;
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.eyebrow {
+  margin: 0 0 0.2rem;
+  color: #7dd3fc;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.muted {
+  margin: 0.35rem 0 0;
+  color: #94a3b8;
+}
+
+.smallText {
+  font-size: 0.8rem;
+}
+
+.statusGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 0.75rem;
+}
+
+.statusCard {
+  display: grid;
+  gap: 0.25rem;
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 10px;
+  padding: 0.75rem;
+}
+
+.statusLabel {
+  color: #94a3b8;
+  font-size: 0.82rem;
+}
+
+.optionList {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.optionCard {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.75rem;
+  align-items: start;
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 10px;
+  padding: 0.85rem;
 }
 
 .playerList {
@@ -105,6 +194,27 @@ body {
   z-index: 2;
 }
 
+.roundMeta {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.roundBadge {
+  display: inline-flex;
+  justify-content: center;
+  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
+  background: #334155;
+  color: #cbd5e1;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.roundBadge.active {
+  background: #0ea5e9;
+  color: #001018;
+}
+
 .cellControl {
   display: grid;
   gap: 0.3rem;
@@ -120,6 +230,10 @@ body {
 }
 
 @media (max-width: 700px) {
+  .row.split {
+    flex-direction: column;
+  }
+
   .scoreboard {
     min-width: 640px;
   }

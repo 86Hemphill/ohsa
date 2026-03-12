@@ -41,6 +41,7 @@ export default function PlayersPage() {
     <main className="screen">
       <h2>Players</h2>
       <div className="stack">
+        <p className="muted">Add players in order of play, starting with the dealer for round 1.</p>
         <div className="row">
           <input
             value={nameInput}

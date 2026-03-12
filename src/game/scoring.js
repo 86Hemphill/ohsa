@@ -1,11 +1,33 @@
+const SCORING_METHODS = {
+  CLASSIC: 'classic',
+  COMPETITIVE: 'competitive',
+}
+
+const DEFAULT_RULES = {
+  scoringMethod: SCORING_METHODS.CLASSIC,
+  screwTheDealer: false,
+}
+
 const DEFAULT_SCORING_CONFIG = {
   exactBonus: 10,
-  missPenaltyPerTrick: 1,
 }
 
 function ensureNumber(value, label) {
   if (typeof value !== 'number' || Number.isNaN(value)) {
     throw new Error(`${label} must be a valid number`)
+  }
+}
+
+function normalizeRules(rules = DEFAULT_RULES) {
+  const scoringMethod = rules.scoringMethod || DEFAULT_RULES.scoringMethod
+
+  if (!Object.values(SCORING_METHODS).includes(scoringMethod)) {
+    throw new Error(`unsupported scoring method: ${scoringMethod}`)
+  }
+
+  return {
+    scoringMethod,
+    screwTheDealer: Boolean(rules.screwTheDealer),
   }
 }
 
@@ -36,17 +58,27 @@ function validateRoundInput({ players, bids, tricks }) {
   })
 }
 
-function calculatePlayerRoundScore({ bid, tricks, config = DEFAULT_SCORING_CONFIG }) {
+function calculatePlayerRoundScore({
+  bid,
+  tricks,
+  config = DEFAULT_SCORING_CONFIG,
+  rules = DEFAULT_RULES,
+}) {
   ensureNumber(bid, 'bid')
   ensureNumber(tricks, 'tricks')
 
+  const normalizedRules = normalizeRules(rules)
   const delta = Math.abs(bid - tricks)
 
   if (delta === 0) {
-    return config.exactBonus + bid
+    return config.exactBonus + tricks
   }
 
-  return -(delta * config.missPenaltyPerTrick)
+  if (normalizedRules.scoringMethod === SCORING_METHODS.CLASSIC) {
+    return tricks
+  }
+
+  return -(delta * config.exactBonus)
 }
 
 function calculateRoundScores({
@@ -55,14 +87,17 @@ function calculateRoundScores({
   tricks,
   previousTotals = {},
   config = DEFAULT_SCORING_CONFIG,
+  rules = DEFAULT_RULES,
 }) {
   validateRoundInput({ players, bids, tricks })
+  const normalizedRules = normalizeRules(rules)
 
   return players.reduce((acc, player) => {
     const roundScore = calculatePlayerRoundScore({
       bid: bids[player],
       tricks: tricks[player],
       config,
+      rules: normalizedRules,
     })
 
     const total = (previousTotals[player] || 0) + roundScore
@@ -78,13 +113,19 @@ function calculateRoundScores({
   }, {})
 }
 
-function buildScoreboard({ players, rounds, config = DEFAULT_SCORING_CONFIG }) {
+function buildScoreboard({
+  players,
+  rounds,
+  config = DEFAULT_SCORING_CONFIG,
+  rules = DEFAULT_RULES,
+}) {
   if (!Array.isArray(rounds)) {
     throw new Error('rounds must be an array')
   }
 
   const results = []
   let totals = {}
+  const normalizedRules = normalizeRules(rules)
 
   rounds.forEach((round, roundIndex) => {
     const roundResult = calculateRoundScores({
@@ -93,6 +134,7 @@ function buildScoreboard({ players, rounds, config = DEFAULT_SCORING_CONFIG }) {
       tricks: round.tricks,
       previousTotals: totals,
       config,
+      rules: normalizedRules,
     })
 
     totals = players.reduce((acc, player) => {
@@ -113,7 +155,10 @@ function buildScoreboard({ players, rounds, config = DEFAULT_SCORING_CONFIG }) {
 }
 
 module.exports = {
+  SCORING_METHODS,
+  DEFAULT_RULES,
   DEFAULT_SCORING_CONFIG,
+  normalizeRules,
   validateRoundInput,
   calculatePlayerRoundScore,
   calculateRoundScores,

@@ -3,13 +3,6 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
-function createCardSequence(maxCards) {
-  const rounds = []
-  for (let i = maxCards; i >= 1; i -= 1) rounds.push(i)
-  for (let i = 2; i <= maxCards; i += 1) rounds.push(i)
-  return rounds
-}
-
 export default function CardsPage() {
   const [maxCards, setMaxCards] = useState(7)
   const [error, setError] = useState('')
@@ -30,16 +23,13 @@ export default function CardsPage() {
       return
     }
 
-    const rounds = createCardSequence(n)
     const game = {
       ...parsed,
       maxCards: n,
-      rounds,
-      entries: rounds.map((cards) => ({ cards, bids: {}, tricks: {} })),
     }
 
     window.localStorage.setItem('ohsa-game', JSON.stringify(game))
-    router.push('/scoreboard')
+    router.push('/rules')
   }
 
   return (
@@ -54,7 +44,7 @@ export default function CardsPage() {
           onChange={(e) => setMaxCards(e.target.value)}
         />
         <button onClick={startGame} className="button primary">
-          Start Game
+          Continue
         </button>
         {error ? <p className="error">{error}</p> : null}
       </div>
