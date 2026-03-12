@@ -36,7 +36,7 @@ You were already using Netlify on site **`ohhell`**, visible from:
 
 No `netlify.toml` existed previously in this repo, so settings were likely configured in the Netlify UI.
 
-I added a `netlify.toml` with Next.js plugin defaults to make deployment config explicit in-repo.
+This repo now includes a minimal `netlify.toml` with the build command and publish directory only. For modern Next.js (13.5+), Netlify applies its current adapter automatically, so pinning `@netlify/plugin-nextjs` in `netlify.toml` is not necessary unless you intentionally want to lock to a specific runtime version.
 
 ## Local development
 

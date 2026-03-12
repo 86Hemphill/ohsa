@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import scoring from '@/game/scoring'
+import scoring from '../../game/scoring'
 
 const { buildScoreboard } = scoring
 
