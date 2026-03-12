@@ -10,7 +10,10 @@
     "react-dom": "18.3.1"
   },
   "devDependencies": {
-    "prettier": "2.1.2"
+    "@types/node": "25.5.0",
+    "@types/react": "19.2.14",
+    "prettier": "2.1.2",
+    "typescript": "5.9.3"
   },
   "keywords": [
     "oh-hell",
