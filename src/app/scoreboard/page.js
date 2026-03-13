@@ -7,7 +7,7 @@ import scoring from '../../game/scoring'
 import setup from '../../game/setup'
 
 const { buildScoreboardProgress, normalizeRules, isRoundComplete } = scoring
-const { GAME_STATUS, createRematchGame, getDealerForRound } = setup
+const { GAME_STATUS, createRematchGame, getDealerForRound, isForbiddenDealerBid } = setup
 
 function toNumber(value) {
   const n = Number(value)
@@ -267,11 +267,17 @@ export default function ScoreboardPage() {
     }
 
     if (field === 'bids' && isActiveRound && rules.screwTheDealer && player === round.dealer) {
-      const totalWithoutDealer = clone.names
-        .filter((name) => name !== player)
-        .reduce((sum, name) => sum + toNumber(round.bids?.[name]), 0)
-      if (next === round.cards - totalWithoutDealer) {
-        nextWarning = `Screw the Dealer is On. ${player} can't say ${next}.`
+      if (
+        isForbiddenDealerBid({
+          players: clone.names,
+          dealer: player,
+          bids: round.bids,
+          cards: round.cards,
+          candidateBid: next,
+        })
+      ) {
+        setWarning(`Screw the Dealer is On. ${player} can't say ${next}.`)
+        return
       }
     }
 
