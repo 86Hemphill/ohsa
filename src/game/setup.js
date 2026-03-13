@@ -61,7 +61,7 @@ function hasGameProgress(game) {
   )
 }
 
-function isForbiddenDealerBid({ players, dealer, bids, cards, candidateBid }) {
+function getForbiddenDealerBidValue({ players, dealer, bids, cards }) {
   ensurePlayers(players)
   ensurePositiveInteger(cards, 'cards')
 
@@ -73,15 +73,19 @@ function isForbiddenDealerBid({ players, dealer, bids, cards, candidateBid }) {
     throw new Error('bids must be an object keyed by player name')
   }
 
-  if (!Number.isInteger(candidateBid) || candidateBid < 0) {
-    throw new Error('candidateBid must be a whole number zero or greater')
-  }
-
   const totalWithoutDealer = players
     .filter((name) => name !== dealer)
     .reduce((sum, name) => sum + Number(bids[name] || 0), 0)
 
-  return candidateBid === cards - totalWithoutDealer
+  return cards - totalWithoutDealer
+}
+
+function isForbiddenDealerBid({ players, dealer, bids, cards, candidateBid }) {
+  if (!Number.isInteger(candidateBid) || candidateBid < 0) {
+    throw new Error('candidateBid must be a whole number zero or greater')
+  }
+
+  return candidateBid === getForbiddenDealerBidValue({ players, dealer, bids, cards })
 }
 
 function createRematchGame(game) {
@@ -114,6 +118,7 @@ module.exports = {
   getDealerForRound,
   createGameEntries,
   hasGameProgress,
+  getForbiddenDealerBidValue,
   isForbiddenDealerBid,
   createRematchGame,
 }

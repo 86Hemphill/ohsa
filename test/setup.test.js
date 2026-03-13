@@ -7,6 +7,7 @@ const {
   getDealerForRound,
   createGameEntries,
   hasGameProgress,
+  getForbiddenDealerBidValue,
   isForbiddenDealerBid,
   createRematchGame,
 } = require('../src/game/setup')
@@ -106,6 +107,16 @@ test('createRematchGame rebuilds a fresh in-progress game with the same table ru
 
 test('isForbiddenDealerBid blocks the dealer from making bids equal cards dealt', () => {
   assert.equal(
+    getForbiddenDealerBidValue({
+      players: ['Ava', 'Bo', 'Cy'],
+      dealer: 'Cy',
+      bids: { Ava: 1, Bo: 1 },
+      cards: 3,
+    }),
+    1
+  )
+
+  assert.equal(
     isForbiddenDealerBid({
       players: ['Ava', 'Bo', 'Cy'],
       dealer: 'Cy',
@@ -118,11 +129,22 @@ test('isForbiddenDealerBid blocks the dealer from making bids equal cards dealt'
 
   assert.equal(
     isForbiddenDealerBid({
+      players: ['Ava', 'Bo'],
+      dealer: 'Ava',
+      bids: { Bo: 2 },
+      cards: 2,
+      candidateBid: 0,
+    }),
+    true
+  )
+
+  assert.equal(
+    isForbiddenDealerBid({
       players: ['Ava', 'Bo', 'Cy'],
       dealer: 'Cy',
       bids: { Ava: 1, Bo: 1 },
       cards: 3,
-      candidateBid: 0,
+      candidateBid: 2,
     }),
     false
   )

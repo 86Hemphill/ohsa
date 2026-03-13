@@ -7,7 +7,7 @@ import scoring from '../../game/scoring'
 import setup from '../../game/setup'
 
 const { buildScoreboardProgress, normalizeRules, isRoundComplete } = scoring
-const { GAME_STATUS, createRematchGame, getDealerForRound, isForbiddenDealerBid } = setup
+const { GAME_STATUS, createRematchGame, getDealerForRound, getForbiddenDealerBidValue, isForbiddenDealerBid } = setup
 
 function toNumber(value) {
   const n = Number(value)
@@ -243,7 +243,7 @@ export default function ScoreboardPage() {
     const clone = structuredClone(game)
     const round = clone.entries[roundIndex]
     const current = hasRecordedValue(round, field, player) ? toNumber(round[field][player]) : 0
-    const next = Math.min(maxForRound, Math.max(0, current + delta))
+    let next = Math.min(maxForRound, Math.max(0, current + delta))
     const isActiveRound = roundIndex === activeRoundIndex
     const roundPhase = round.phase || 'bidding'
     let nextWarning = ''
@@ -267,6 +267,20 @@ export default function ScoreboardPage() {
     }
 
     if (field === 'bids' && isActiveRound && rules.screwTheDealer && player === round.dealer) {
+      const forbiddenBid = getForbiddenDealerBidValue({
+        players: clone.names,
+        dealer: player,
+        bids: round.bids,
+        cards: round.cards,
+      })
+
+      if (next === forbiddenBid && next >= 0 && next <= maxForRound) {
+        const skipped = next + (delta > 0 ? 1 : -1)
+        if (skipped >= 0 && skipped <= maxForRound) {
+          next = skipped
+        }
+      }
+
       if (
         isForbiddenDealerBid({
           players: clone.names,
@@ -354,9 +368,26 @@ export default function ScoreboardPage() {
 
   const setRoundPhase = (roundIndex, phase) => {
     const clone = structuredClone(game)
+    const round = clone.entries[roundIndex]
+
+    if (
+      phase === 'playing' &&
+      rules.screwTheDealer &&
+      isForbiddenDealerBid({
+        players: clone.names,
+        dealer: round.dealer,
+        bids: round.bids,
+        cards: round.cards,
+        candidateBid: toNumber(round.bids?.[round.dealer]),
+      })
+    ) {
+      setWarning(`Screw the Dealer is On. ${round.dealer} can't say ${toNumber(round.bids?.[round.dealer])}.`)
+      return
+    }
+
     clone.progressed = true
     clone.status = GAME_STATUS.IN_PROGRESS
-    clone.entries[roundIndex].phase = phase
+    round.phase = phase
     window.localStorage.setItem('ohsa-game', JSON.stringify(clone))
     setWarning('')
     setVersion((v) => v + 1)
