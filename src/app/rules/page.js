@@ -150,7 +150,7 @@ export default function RulesPage() {
           <div className="row wrap">
             <button
               className="button secondary"
-              onClick={() => router.push(hasStartedGame ? '/scoreboard' : '/cards')}
+              onClick={() => router.push(hasStartedGame ? '/scoreboard' : '/players')}
             >
               Back
             </button>

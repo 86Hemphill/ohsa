@@ -130,6 +130,11 @@ p {
   gap: 1rem;
 }
 
+.scoreboardFooter {
+  display: grid;
+  gap: 1rem;
+}
+
 .appShell {
   width: min(720px, 100%);
 }
@@ -394,14 +399,6 @@ p {
 .scoreboardWrap {
   width: 100%;
   overflow: auto;
-}
-
-.scoreboardSummary {
-  display: grid;
-  gap: 1rem;
-  position: sticky;
-  top: 1rem;
-  z-index: 4;
 }
 
 .ruleList {
@@ -829,10 +826,6 @@ p {
     flex-direction: column;
   }
 
-  .scoreboardSummary {
-    position: static;
-  }
-
   .roundCardHeader,
   .roundHeaderSide {
     justify-items: flex-start;
@@ -894,11 +887,5 @@ p {
   .cellControl button {
     min-width: 2.4rem;
     min-height: 2.4rem;
-  }
-}
-
-@media (max-width: 1024px) and (orientation: landscape) {
-  .scoreboardSummary {
-    position: static;
   }
 }

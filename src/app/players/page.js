@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 export default function PlayersPage() {
   const [nameInput, setNameInput] = useState('')
   const [names, setNames] = useState([])
+  const [maxCards, setMaxCards] = useState(7)
   const [error, setError] = useState('')
   const router = useRouter()
 
@@ -31,15 +32,21 @@ export default function PlayersPage() {
     addPlayer()
   }
 
-  const continueToCards = () => {
+  const continueToRules = () => {
     if (names.length < 2) {
       setError('Add at least 2 players to start.')
       return
     }
 
-    const game = { names }
+    const n = Number(maxCards)
+    if (!Number.isInteger(n) || n < 1) {
+      setError('Max cards must be a positive whole number.')
+      return
+    }
+
+    const game = { names, maxCards: n }
     window.localStorage.setItem('ohsa-game', JSON.stringify(game))
-    router.push('/cards')
+    router.push('/rules')
   }
 
   return (
@@ -86,9 +93,23 @@ export default function PlayersPage() {
             </div>
           </form>
 
+          <div className="stack compact">
+            <label htmlFor="max-cards" className="eyebrow">
+              Max Cards
+            </label>
+            <input
+              id="max-cards"
+              className="input"
+              type="number"
+              min="1"
+              value={maxCards}
+              onChange={(e) => setMaxCards(e.target.value)}
+            />
+          </div>
+
           {error ? <p className="error">{error}</p> : null}
 
-          <button onClick={continueToCards} className="button primary">
+          <button onClick={continueToRules} className="button primary">
             Continue
           </button>
         </div>

@@ -217,6 +217,10 @@ export default function ScoreboardPage() {
   }
 
   const resetGame = () => {
+    if (!window.confirm('Reset all bids and tricks for this game?')) {
+      return
+    }
+
     const resetEntries = entries.map((entry) => ({
       ...entry,
       bids: {},
@@ -237,6 +241,10 @@ export default function ScoreboardPage() {
   }
 
   const finishGame = () => {
+    if (!window.confirm('Save these standings as the finished game?')) {
+      return
+    }
+
     window.localStorage.setItem(
       'ohsa-game',
       JSON.stringify({
@@ -249,6 +257,10 @@ export default function ScoreboardPage() {
   }
 
   const clearSavedGame = () => {
+    if (!window.confirm('Clear the saved game from this device?')) {
+      return
+    }
+
     window.localStorage.removeItem('ohsa-game')
     router.push('/')
   }
@@ -300,86 +312,6 @@ export default function ScoreboardPage() {
   return (
     <main className="screen wide">
       <div className="stack wideStack scoreboardShell">
-        <section className="panel scoreboardSummary">
-          <div className="row split">
-            <div className="stack compact">
-              <div>
-                <p className="eyebrow">{gameFinished ? 'Final results' : 'Game in progress'}</p>
-                <h2>{gameFinished ? 'Results' : 'Scoreboard'}</h2>
-                {activeRound ? (
-                  <p className="muted">
-                    Round {activeRoundIndex + 1} of {entries.length} - {getCardsLabel(activeRound.cards)}
-                  </p>
-                ) : null}
-              </div>
-              <div className="ruleList">
-                <span className="ruleChip">
-                  {rules.scoringMethod === 'competitive' ? 'Competitive Scoring' : 'Classic Scoring'}
-                </span>
-                <span className="ruleChip">Screw the Dealer: {rules.screwTheDealer ? 'On' : 'Off'}</span>
-                <span className="ruleChip">
-                  1-card round twice: {rules.playSingleCardRoundTwice ? 'On' : 'Off'}
-                </span>
-              </div>
-            </div>
-            <div className="row wrap">
-              <Link href="/rules" className="button secondary">
-                View Rules
-              </Link>
-              {gameFinished ? (
-                <>
-                  <button className="button secondary" onClick={reopenGame}>
-                    Reopen Game
-                  </button>
-                  <button className="button secondary" onClick={startRematch}>
-                    Rematch
-                  </button>
-                  <button className="button danger" onClick={clearSavedGame}>
-                    Clear Saved Game
-                  </button>
-                </>
-              ) : (
-                <>
-                  <button className="button secondary" onClick={resetGame}>
-                    Reset Scores
-                  </button>
-                  <button className="button danger" onClick={finishGame}>
-                    Finish Game
-                  </button>
-                </>
-              )}
-            </div>
-          </div>
-
-          {activeRound && !gameFinished ? (
-            <div className="statusRow">
-              <span className="statusInline">Dealer {activeRound.dealer}</span>
-              <span className="statusInline">{activePhase === 'playing' ? 'Play' : 'Bid'} phase</span>
-              <span className="statusInline">Bid {bidTotal}</span>
-              <span className="statusInline">
-                Got {gotTotal} / {activeRound.cards}
-              </span>
-            </div>
-          ) : null}
-
-          <div className="standingsStrip">
-            {placings.map((entry) => (
-              <div key={entry.name} className="standingCard">
-                <span className="standingPlace">{entry.label}</span>
-                <strong>{entry.name}</strong>
-                <span>{entry.score}</span>
-              </div>
-            ))}
-          </div>
-
-          {gameFinished ? (
-            <div className="finalSummary">
-              <p className="muted">The current standings are locked in as your saved final results.</p>
-              <p className="muted">Use Rematch to start over with the same players, rules, and card count.</p>
-            </div>
-          ) : null}
-        </section>
-
         <section className="roundList">
           {entries.map((entry, roundIndex) => {
             const roundProgress = board.rounds[roundIndex]
@@ -546,6 +478,61 @@ export default function ScoreboardPage() {
               </article>
             )
           })}
+        </section>
+
+        <section className="panel scoreboardFooter">
+          <div className="ruleList">
+            <span className="ruleChip">
+              {rules.scoringMethod === 'competitive' ? 'Competitive Scoring' : 'Classic Scoring'}
+            </span>
+            <span className="ruleChip">Screw the Dealer: {rules.screwTheDealer ? 'On' : 'Off'}</span>
+            <span className="ruleChip">1-card round twice: {rules.playSingleCardRoundTwice ? 'On' : 'Off'}</span>
+          </div>
+
+          <div className="standingsStrip">
+            {placings.map((entry) => (
+              <div key={entry.name} className="standingCard">
+                <span className="standingPlace">{entry.label}</span>
+                <strong>{entry.name}</strong>
+                <span>{entry.score}</span>
+              </div>
+            ))}
+          </div>
+
+          {gameFinished ? (
+            <div className="finalSummary">
+              <p className="muted">The current standings are locked in as your saved final results.</p>
+              <p className="muted">Use Rematch to start over with the same players, rules, and card count.</p>
+            </div>
+          ) : null}
+
+          <div className="row wrap">
+            <Link href="/rules" className="button secondary">
+              View Rules
+            </Link>
+            {gameFinished ? (
+              <>
+                <button className="button secondary" onClick={reopenGame}>
+                  Reopen Game
+                </button>
+                <button className="button secondary" onClick={startRematch}>
+                  Rematch
+                </button>
+                <button className="button danger" onClick={clearSavedGame}>
+                  Clear Saved Game
+                </button>
+              </>
+            ) : (
+              <>
+                <button className="button secondary" onClick={resetGame}>
+                  Reset Scores
+                </button>
+                <button className="button danger" onClick={finishGame}>
+                  Finish Game
+                </button>
+              </>
+            )}
+          </div>
         </section>
       </div>
     </main>
