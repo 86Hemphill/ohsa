@@ -67,6 +67,50 @@ function formatOverUnder(value) {
   return 'Even'
 }
 
+function getExactBidStats(players, entries) {
+  return players.map((name) => {
+    let exact = 0
+    let completed = 0
+
+    entries.forEach((entry) => {
+      if (!hasRecordedValue(entry, 'bids', name) || !hasRecordedValue(entry, 'tricks', name)) return
+      completed += 1
+      if (toNumber(entry.bids?.[name]) === toNumber(entry.tricks?.[name])) {
+        exact += 1
+      }
+    })
+
+    return {
+      name,
+      exact,
+      completed,
+      rate: completed ? exact / completed : 0,
+    }
+  })
+}
+
+function getToughestRound(rounds) {
+  let best = null
+
+  rounds.forEach((round, index) => {
+    if (!round.complete || !round.scores) return
+
+    const totalSwing = Object.values(round.scores).reduce(
+      (sum, entry) => sum + Math.abs(entry.bid - entry.tricks),
+      0
+    )
+
+    if (!best || totalSwing > best.totalSwing) {
+      best = {
+        round: index + 1,
+        totalSwing,
+      }
+    }
+  })
+
+  return best
+}
+
 function isGameFinished(game, entries, currentRoundIndex) {
   if (game?.status === GAME_STATUS.FINISHED) return true
   return Array.isArray(entries) && entries.length > 0 && currentRoundIndex === -1
@@ -141,6 +185,14 @@ export default function ScoreboardPage() {
   const overUnderTotal = gotTotal - bidTotal
   const activePhase = activeRound?.phase || 'bidding'
   const placings = getPlacings(game.names, board.totals)
+  const exactBidStats = getExactBidStats(game.names, entries)
+  const bestExactBidder = [...exactBidStats]
+    .filter((entry) => entry.completed > 0)
+    .sort((a, b) => b.rate - a.rate || b.exact - a.exact)[0] || null
+  const leader = placings[0] || null
+  const runnerUp = placings[1] || null
+  const margin = leader && runnerUp ? leader.score - runnerUp.score : null
+  const toughestRound = getToughestRound(board.rounds)
   const dealerRestrictedBid =
     activeRound && !gameFinished && rules.screwTheDealer && activePhase === 'bidding'
       ? activeRound.cards -
@@ -317,6 +369,172 @@ export default function ScoreboardPage() {
     setEditingRounds({})
     setWarning('')
     setVersion((v) => v + 1)
+  }
+
+  if (gameFinished) {
+    return (
+      <main className="screen wide">
+        <div className="stack wideStack scoreboardShell">
+          <section className="panel resultsHero">
+            <p className="eyebrow">Final Results</p>
+            <h2>Game Complete</h2>
+            <div className="ruleList">
+              <span className="ruleChip">
+                {rules.scoringMethod === 'competitive' ? 'Competitive Scoring' : 'Classic Scoring'}
+              </span>
+              <span className="ruleChip">Screw the Dealer: {rules.screwTheDealer ? 'On' : 'Off'}</span>
+              <span className="ruleChip">1-card round twice: {rules.playSingleCardRoundTwice ? 'On' : 'Off'}</span>
+            </div>
+          </section>
+
+          <section className="resultsGrid">
+            <section className="panel standingsPanel">
+              <p className="eyebrow">Standings</p>
+              <div className="resultsStandings">
+                {placings.map((entry, index) => (
+                  <div key={entry.name} className={`resultPlaceCard place-${index + 1}`}>
+                    <span className="standingPlace">{entry.label}</span>
+                    <strong>{entry.name}</strong>
+                    <span className="resultScore">{entry.score}</span>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            <section className="panel momentsPanel">
+              <p className="eyebrow">Top Moments</p>
+              <div className="momentsList">
+                <div className="momentCard">
+                  <span className="controlLabel">Winner</span>
+                  <strong>{leader ? leader.name : '-'}</strong>
+                  <span>{margin !== null ? `Won by ${margin}` : 'Solo result'}</span>
+                </div>
+                <div className="momentCard">
+                  <span className="controlLabel">Best Exact-Bid Rate</span>
+                  <strong>{bestExactBidder ? bestExactBidder.name : '-'}</strong>
+                  <span>
+                    {bestExactBidder
+                      ? `${bestExactBidder.exact} of ${bestExactBidder.completed} exact`
+                      : 'No completed rounds'}
+                  </span>
+                </div>
+                <div className="momentCard">
+                  <span className="controlLabel">Toughest Round</span>
+                  <strong>{toughestRound ? `Round ${toughestRound.round}` : '-'}</strong>
+                  <span>{toughestRound ? `Total miss: ${toughestRound.totalSwing}` : 'No completed rounds'}</span>
+                </div>
+              </div>
+            </section>
+          </section>
+
+          <section className="panel roundHistoryPanel">
+            <p className="eyebrow">Round History</p>
+            <div className="roundList">
+              {entries.map((entry, roundIndex) => {
+                const roundProgress = board.rounds[roundIndex]
+                const isExpanded = Boolean(expandedRounds[roundIndex])
+
+                return (
+                  <article key={`${entry.cards}-${roundIndex}`} className="roundCard complete">
+                    <div className="roundCardHeader">
+                      <div className="roundHeaderMain">
+                        <h3>Round {roundIndex + 1}</h3>
+                        <div className="roundHeaderMeta">
+                          <span className="roundCardCount">{getCardsLabel(entry.cards)}</span>
+                          <span>Dealer {entry.dealer}</span>
+                        </div>
+                      </div>
+                      <div className="roundHeaderSide">
+                        <button className="button secondary roundToggle" onClick={() => toggleRoundDetails(roundIndex)}>
+                          {isExpanded ? 'Hide details' : 'Show details'}
+                        </button>
+                      </div>
+                    </div>
+
+                    {!isExpanded ? (
+                      <div className="roundSummaryGrid">
+                        {game.names.map((name) => {
+                          const roundScore = roundProgress.scores?.[name]?.roundScore
+                          const runningTotal = roundProgress.totals?.[name] ?? board.totals[name] ?? 0
+
+                          return (
+                            <div key={`${name}-${roundIndex}`} className="roundSummaryItem">
+                              <strong>{name}</strong>
+                              <span>{roundScore === undefined ? '-' : formatSignedScore(roundScore)}</span>
+                              <span>Total {runningTotal}</span>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    ) : (
+                      <div className="roundRows">
+                        {game.names.map((name) => {
+                          const roundScore = roundProgress.scores?.[name]?.roundScore
+                          const runningTotal = roundProgress.totals?.[name] ?? board.totals[name] ?? 0
+                          const bid = toNumber(entry.bids?.[name])
+                          const got = toNumber(entry.tricks?.[name])
+                          const diff = got - bid
+
+                          return (
+                            <div key={`${name}-${roundIndex}`} className="playerRoundRow resultsRow">
+                              <div className="playerRoundIdentity">
+                                <strong>{name}</strong>
+                                {entry.dealer === name ? <span className="dealerTag">Dealer</span> : null}
+                              </div>
+                              <div className="playerRoundControls">
+                                <div className="scoreMeta">
+                                  <span className="controlLabel">Bid</span>
+                                  <strong>{bid}</strong>
+                                </div>
+                                <div className="scoreMeta">
+                                  <span className="controlLabel">Got</span>
+                                  <strong>{got}</strong>
+                                </div>
+                                <div className="scoreMeta">
+                                  <span className="controlLabel">Over/Under</span>
+                                  <strong>{formatOverUnder(diff)}</strong>
+                                </div>
+                              </div>
+                              <div className="playerRoundScores">
+                                <div className="scoreMeta">
+                                  <span className="controlLabel">Score</span>
+                                  <strong>{roundScore === undefined ? '-' : formatSignedScore(roundScore)}</strong>
+                                </div>
+                                <div className="scoreMeta">
+                                  <span className="controlLabel">Total</span>
+                                  <strong>{runningTotal}</strong>
+                                </div>
+                              </div>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    )}
+                  </article>
+                )
+              })}
+            </div>
+          </section>
+
+          <section className="panel scoreboardFooter">
+            <div className="row wrap">
+              <button className="button primary" onClick={startRematch}>
+                Rematch Same Table
+              </button>
+              <button className="button secondary" onClick={reopenGame}>
+                Reopen Game
+              </button>
+              <Link href="/players" className="button secondary">
+                New Game
+              </Link>
+              <button className="button danger" onClick={clearSavedGame}>
+                Clear Saved Game
+              </button>
+            </div>
+          </section>
+        </div>
+      </main>
+    )
   }
 
   return (
