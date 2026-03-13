@@ -76,12 +76,3 @@ npm run build
 ## Deployment
 
 The app is configured for Netlify with repo-based build settings in [`netlify.toml`](./netlify.toml).
-
-## Repository name
-
-If you want the repo name to match the product better, I would rename it to one of these:
-
-- `oh-hell-scorekeeper`
-- `oh-hell-score-app`
-
-My preference is `oh-hell-scorekeeper`. It is clearer than `ohsa` for visitors and shared links.
