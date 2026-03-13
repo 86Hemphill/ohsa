@@ -222,6 +222,23 @@ p {
   gap: 0.75rem;
 }
 
+.statusRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.statusInline {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  background: rgba(9, 20, 36, 0.9);
+  border: 1px solid rgba(43, 102, 96, 0.9);
+  color: #d8e5ef;
+  font-size: 0.88rem;
+}
+
 .statusCard {
   display: grid;
   gap: 0.25rem;
@@ -489,6 +506,11 @@ p {
   justify-items: end;
 }
 
+.roundActionGroup {
+  display: grid;
+  gap: 0.35rem;
+}
+
 .roundStatePill {
   display: inline-flex;
   padding: 0.28rem 0.65rem;
@@ -667,6 +689,16 @@ p {
   font-size: 0.78rem;
 }
 
+.roundAlert {
+  margin: 0.35rem 0 0;
+  padding: 0.55rem 0.7rem;
+  border-radius: 12px;
+  background: rgba(120, 27, 38, 0.22);
+  border: 1px solid rgba(184, 74, 98, 0.32);
+  color: #ffd2db;
+  font-size: 0.82rem;
+}
+
 .roundToggle {
   padding: 0.45rem 0.7rem;
   font-size: 0.84rem;
@@ -753,6 +785,10 @@ p {
 
   .row {
     align-items: stretch;
+  }
+
+  .statusRow {
+    flex-direction: column;
   }
 
   .scoreboardSummary {
