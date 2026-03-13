@@ -8,17 +8,27 @@ const { createGameEntries } = setup
 
 export default function RulesPage() {
   const router = useRouter()
-  const [scoringMethod, setScoringMethod] = useState('classic')
-  const [screwTheDealer, setScrewTheDealer] = useState(false)
-  const [error, setError] = useState('')
-
   const game = useMemo(() => {
     if (typeof window === 'undefined') return null
     const stored = window.localStorage.getItem('ohsa-game')
     return stored ? JSON.parse(stored) : null
   }, [])
+  const hasStartedGame = Boolean(game?.entries?.length)
+  const hasProgress = Boolean(
+    game?.entries?.some(
+      (entry) => Object.keys(entry.bids || {}).length > 0 || Object.keys(entry.tricks || {}).length > 0
+    )
+  )
+  const [scoringMethod, setScoringMethod] = useState(game?.rules?.scoringMethod || 'classic')
+  const [screwTheDealer, setScrewTheDealer] = useState(Boolean(game?.rules?.screwTheDealer))
+  const [error, setError] = useState('')
 
   const startGame = () => {
+    if (hasStartedGame) {
+      router.push('/scoreboard')
+      return
+    }
+
     if (!game || !Array.isArray(game.names) || !game.names.length) {
       setError('No player order found. Add players first.')
       return
@@ -61,6 +71,7 @@ export default function RulesPage() {
                 <button
                   type="button"
                   className={scoringMethod === 'classic' ? 'choiceCard active' : 'choiceCard'}
+                  disabled={hasStartedGame}
                   onClick={() => setScoringMethod('classic')}
                 >
                   <strong>Classic</strong>
@@ -69,6 +80,7 @@ export default function RulesPage() {
                 <button
                   type="button"
                   className={scoringMethod === 'competitive' ? 'choiceCard active' : 'choiceCard'}
+                  disabled={hasStartedGame}
                   onClick={() => setScoringMethod('competitive')}
                 >
                   <strong>Competitive</strong>
@@ -82,6 +94,7 @@ export default function RulesPage() {
               <button
                 type="button"
                 className={screwTheDealer ? 'choiceCard toggleCard active' : 'choiceCard toggleCard'}
+                disabled={hasStartedGame}
                 onClick={() => setScrewTheDealer((current) => !current)}
               >
                 <div className="row split">
@@ -100,17 +113,23 @@ export default function RulesPage() {
               <p className="eyebrow">Dealer Order</p>
               <p className="muted">Round 1 dealer: {game.names[0]}</p>
               <p className="muted">Dealer rotates in the same player order every round.</p>
+              {hasProgress ? (
+                <p className="muted">Rules are locked once the game has started.</p>
+              ) : null}
             </div>
           ) : null}
 
           {error ? <p className="error">{error}</p> : null}
 
           <div className="row wrap">
-            <button className="button secondary" onClick={() => router.push('/cards')}>
+            <button
+              className="button secondary"
+              onClick={() => router.push(hasStartedGame ? '/scoreboard' : '/cards')}
+            >
               Back
             </button>
             <button className="button primary" onClick={startGame}>
-              Start Game
+              {hasStartedGame ? 'Return to Game' : 'Start Game'}
             </button>
           </div>
         </div>

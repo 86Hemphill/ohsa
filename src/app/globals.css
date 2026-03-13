@@ -6,7 +6,7 @@ body {
   margin: 0;
   font-family: Georgia, 'Times New Roman', serif;
   background:
-    radial-gradient(circle at top, rgba(25, 78, 120, 0.2), transparent 32%),
+    radial-gradient(circle at top, rgba(20, 122, 112, 0.22), transparent 32%),
     linear-gradient(180deg, #02040b 0%, #030712 42%, #06101f 100%);
   color: #f4f1e8;
 }
@@ -50,7 +50,7 @@ p {
 
 .card {
   background: rgba(9, 17, 30, 0.78);
-  border: 1px solid rgba(123, 163, 196, 0.18);
+  border: 1px solid rgba(102, 175, 162, 0.2);
   border-radius: 20px;
   padding: 1.25rem;
   width: min(560px, 100%);
@@ -84,13 +84,13 @@ p {
   gap: 1rem;
   padding: 1.5rem;
   background: linear-gradient(180deg, rgba(8, 16, 28, 0.92), rgba(6, 14, 24, 0.78));
-  border: 1px solid rgba(125, 161, 190, 0.22);
+  border: 1px solid rgba(93, 170, 156, 0.24);
   border-radius: 26px;
   box-shadow: 0 20px 48px rgba(0, 0, 0, 0.3);
 }
 
 .heroLead {
-  color: #c0d2e4;
+  color: #b7d8d2;
   font-size: 1.08rem;
   line-height: 1.55;
 }
@@ -140,7 +140,7 @@ p {
   width: 100%;
   padding: 0.95rem 1rem;
   border-radius: 14px;
-  border: 1px solid #294765;
+  border: 1px solid #2b6660;
   background: rgba(7, 20, 39, 0.88);
   color: #f8fafc;
   font-size: 1rem;
@@ -158,15 +158,15 @@ p {
 }
 
 .button.primary {
-  background: linear-gradient(180deg, #2cb8ef 0%, #1f9bd6 100%);
-  color: #04111f;
+  background: linear-gradient(180deg, #35b8a6 0%, #208576 100%);
+  color: #041714;
   font-weight: 700;
   text-decoration: none;
   text-align: center;
 }
 
 .button.secondary {
-  background: rgba(30, 48, 74, 0.9);
+  background: rgba(29, 57, 64, 0.92);
   color: #e2e8f0;
   text-decoration: none;
   text-align: center;
@@ -182,7 +182,7 @@ p {
 
 .panel {
   background: linear-gradient(180deg, rgba(8, 16, 28, 0.88), rgba(8, 18, 34, 0.76));
-  border: 1px solid rgba(96, 132, 166, 0.2);
+  border: 1px solid rgba(77, 145, 135, 0.24);
   border-radius: 20px;
   padding: 1.25rem;
   box-shadow: 0 16px 36px rgba(0, 0, 0, 0.22);
@@ -190,7 +190,7 @@ p {
 
 .eyebrow {
   margin: 0 0 0.2rem;
-  color: #8fd7ff;
+  color: #7bdac8;
   font-size: 0.8rem;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -199,7 +199,7 @@ p {
 
 .muted {
   margin: 0.35rem 0 0;
-  color: #9db6cf;
+  color: #9fc4be;
 }
 
 .smallText {
@@ -216,7 +216,7 @@ p {
   display: grid;
   gap: 0.25rem;
   background: rgba(9, 20, 36, 0.9);
-  border: 1px solid #294765;
+  border: 1px solid #2b6660;
   border-radius: 14px;
   padding: 0.75rem;
 }
@@ -248,7 +248,7 @@ p {
   padding: 1rem;
   border-radius: 16px;
   background: rgba(7, 18, 33, 0.72);
-  border: 1px solid rgba(73, 111, 145, 0.26);
+  border: 1px solid rgba(66, 126, 119, 0.28);
 }
 
 .countBadge {
@@ -258,8 +258,8 @@ p {
   align-items: center;
   padding: 0.35rem 0.7rem;
   border-radius: 999px;
-  background: rgba(44, 184, 239, 0.2);
-  color: #9ae2ff;
+  background: rgba(53, 184, 166, 0.2);
+  color: #8ae7d7;
   font-weight: 700;
 }
 
@@ -279,7 +279,7 @@ p {
   padding: 0.75rem 0.9rem;
   border-radius: 14px;
   background: rgba(14, 30, 52, 0.92);
-  border: 1px solid rgba(67, 108, 146, 0.28);
+  border: 1px solid rgba(63, 118, 112, 0.28);
 }
 
 .rosterIndex {
@@ -289,8 +289,8 @@ p {
   width: 2rem;
   height: 2rem;
   border-radius: 999px;
-  background: rgba(44, 184, 239, 0.18);
-  color: #9ae2ff;
+  background: rgba(53, 184, 166, 0.18);
+  color: #8ae7d7;
   font-weight: 700;
 }
 
@@ -298,9 +298,9 @@ p {
   margin: 0;
   padding: 1rem;
   border-radius: 14px;
-  color: #9db6cf;
+  color: #9fc4be;
   background: rgba(10, 24, 41, 0.72);
-  border: 1px dashed rgba(90, 130, 165, 0.34);
+  border: 1px dashed rgba(84, 130, 124, 0.34);
 }
 
 .segmentedGrid {
@@ -314,7 +314,7 @@ p {
   gap: 0.45rem;
   padding: 1rem;
   border-radius: 16px;
-  border: 1px solid rgba(62, 98, 133, 0.32);
+  border: 1px solid rgba(60, 105, 101, 0.34);
   background: rgba(10, 22, 38, 0.82);
   color: #f4f1e8;
   text-align: left;
@@ -326,9 +326,14 @@ p {
 }
 
 .choiceCard.active {
-  border-color: rgba(89, 209, 255, 0.78);
-  background: linear-gradient(180deg, rgba(18, 49, 79, 0.95), rgba(9, 26, 46, 0.92));
-  box-shadow: inset 0 0 0 1px rgba(102, 216, 255, 0.22);
+  border-color: rgba(101, 221, 199, 0.78);
+  background: linear-gradient(180deg, rgba(16, 58, 56, 0.96), rgba(10, 34, 36, 0.92));
+  box-shadow: inset 0 0 0 1px rgba(119, 224, 205, 0.24);
+}
+
+.choiceCard:disabled {
+  opacity: 0.74;
+  cursor: not-allowed;
 }
 
 .toggleCard {
@@ -345,8 +350,8 @@ p {
 }
 
 .togglePill.on {
-  background: rgba(44, 184, 239, 0.2);
-  color: #9ae2ff;
+  background: rgba(53, 184, 166, 0.2);
+  color: #8ae7d7;
 }
 
 .insetPanel {
@@ -367,7 +372,7 @@ p {
 .scoreboard th,
 .scoreboard td {
   background: rgba(8, 18, 34, 0.9);
-  border: 1px solid #294765;
+  border: 1px solid #2b6660;
   border-radius: 8px;
   padding: 0.5rem;
   text-align: center;
@@ -397,8 +402,8 @@ p {
 }
 
 .roundBadge.active {
-  background: #2cb8ef;
-  color: #04111f;
+  background: #35b8a6;
+  color: #041714;
 }
 
 .cellControl {
@@ -413,6 +418,18 @@ p {
   margin: 0 0.15rem;
   border-radius: 8px;
   border: 0;
+  background: rgba(53, 184, 166, 0.14);
+  color: #d9f6f1;
+}
+
+.cellControl button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.runningTotal {
+  color: #9fc4be;
+  font-size: 0.78rem;
 }
 
 @media (max-width: 700px) {

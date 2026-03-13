@@ -81,6 +81,26 @@ function calculatePlayerRoundScore({
   return -(delta * config.exactBonus)
 }
 
+function isRoundComplete({ players, bids, tricks }) {
+  if (!Array.isArray(players) || players.length === 0) {
+    return false
+  }
+
+  if (!bids || typeof bids !== 'object' || !tricks || typeof tricks !== 'object') {
+    return false
+  }
+
+  return players.every(
+    (player) =>
+      Object.prototype.hasOwnProperty.call(bids, player) &&
+      Object.prototype.hasOwnProperty.call(tricks, player) &&
+      typeof bids[player] === 'number' &&
+      !Number.isNaN(bids[player]) &&
+      typeof tricks[player] === 'number' &&
+      !Number.isNaN(tricks[player])
+  )
+}
+
 function calculateRoundScores({
   players,
   bids,
@@ -154,13 +174,68 @@ function buildScoreboard({
   }
 }
 
+function buildScoreboardProgress({
+  players,
+  rounds,
+  config = DEFAULT_SCORING_CONFIG,
+  rules = DEFAULT_RULES,
+}) {
+  if (!Array.isArray(rounds)) {
+    throw new Error('rounds must be an array')
+  }
+
+  const normalizedRules = normalizeRules(rules)
+  const results = []
+  let totals = {}
+
+  rounds.forEach((round, roundIndex) => {
+    if (!isRoundComplete({ players, bids: round.bids, tricks: round.tricks })) {
+      results.push({
+        round: roundIndex + 1,
+        complete: false,
+        scores: null,
+        totals: { ...totals },
+      })
+      return
+    }
+
+    const roundResult = calculateRoundScores({
+      players,
+      bids: round.bids,
+      tricks: round.tricks,
+      previousTotals: totals,
+      config,
+      rules: normalizedRules,
+    })
+
+    totals = players.reduce((acc, player) => {
+      acc[player] = roundResult[player].total
+      return acc
+    }, {})
+
+    results.push({
+      round: roundIndex + 1,
+      complete: true,
+      scores: roundResult,
+      totals: { ...totals },
+    })
+  })
+
+  return {
+    rounds: results,
+    totals,
+  }
+}
+
 module.exports = {
   SCORING_METHODS,
   DEFAULT_RULES,
   DEFAULT_SCORING_CONFIG,
   normalizeRules,
+  isRoundComplete,
   validateRoundInput,
   calculatePlayerRoundScore,
   calculateRoundScores,
   buildScoreboard,
+  buildScoreboardProgress,
 }

@@ -5,9 +5,11 @@ const {
   SCORING_METHODS,
   DEFAULT_RULES,
   DEFAULT_SCORING_CONFIG,
+  isRoundComplete,
   calculatePlayerRoundScore,
   calculateRoundScores,
   buildScoreboard,
+  buildScoreboardProgress,
 } = require('../src/game/scoring')
 
 test('calculatePlayerRoundScore gives bonus+bid when bid is exact', () => {
@@ -110,4 +112,39 @@ test('buildScoreboard throws when round input is missing players', () => {
       ],
     })
   )
+})
+
+test('isRoundComplete returns false when a round is still missing values', () => {
+  assert.equal(
+    isRoundComplete({
+      players: ['Ava', 'Bo'],
+      bids: { Ava: 1, Bo: 2 },
+      tricks: { Ava: 1 },
+    }),
+    false
+  )
+})
+
+test('buildScoreboardProgress skips incomplete rounds in totals', () => {
+  const board = buildScoreboardProgress({
+    players: ['Ava', 'Bo'],
+    rounds: [
+      {
+        bids: { Ava: 1, Bo: 0 },
+        tricks: { Ava: 1, Bo: 0 },
+      },
+      {
+        bids: { Ava: 2 },
+        tricks: {},
+      },
+    ],
+  })
+
+  assert.equal(board.rounds[0].complete, true)
+  assert.equal(board.rounds[1].complete, false)
+  assert.equal(board.rounds[1].scores, null)
+  assert.deepEqual(board.totals, {
+    Ava: 11,
+    Bo: 10,
+  })
 })
