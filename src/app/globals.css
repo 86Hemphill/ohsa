@@ -203,6 +203,38 @@ p {
   gap: 0.9rem;
 }
 
+.helpShell {
+  width: min(960px, 100%);
+}
+
+.helpGrid,
+.faqGrid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.helpList {
+  margin: 0;
+  padding-left: 1.25rem;
+  display: grid;
+  gap: 0.6rem;
+  color: #d9e7e4;
+}
+
+.faqCard {
+  display: grid;
+  gap: 0.35rem;
+  padding: 1rem;
+  border-radius: 16px;
+  background: rgba(9, 20, 36, 0.9);
+  border: 1px solid rgba(66, 126, 119, 0.24);
+}
+
+.helpActions {
+  align-items: center;
+}
+
 .roomy {
   gap: 1.1rem;
 }
@@ -888,6 +920,11 @@ p {
   }
 
   .resultsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .helpGrid,
+  .faqGrid {
     grid-template-columns: 1fr;
   }
 

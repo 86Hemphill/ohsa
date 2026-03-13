@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import setup from '../../game/setup'
@@ -145,6 +146,9 @@ export default function RulesPage() {
           {error ? <p className="error">{error}</p> : null}
 
           <div className="row wrap">
+            <Link href="/how-to-play" className="button secondary">
+              How to Play
+            </Link>
             <button
               className="button secondary"
               onClick={() => router.push(hasProgress ? '/scoreboard' : '/players')}

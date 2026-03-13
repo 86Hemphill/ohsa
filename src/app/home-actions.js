@@ -30,6 +30,9 @@ export default function HomeActions() {
       <Link href="/players" className="button primary">
         New Game
       </Link>
+      <Link href="/how-to-play" className="button secondary">
+        How to Play
+      </Link>
       {hasSavedGame ? (
         <>
           <Link href={isSetupDraft ? '/rules' : '/scoreboard'} className="button secondary">
