@@ -85,7 +85,7 @@ export default function PlayersPage() {
       <div className="stack appShell">
         <div className="panel stack roomy">
           <div>
-            <h2>Players</h2>
+            <h2>Setup</h2>
             <p className="muted">Add players in order of play, starting with the dealer for round 1.</p>
           </div>
 
@@ -97,6 +97,19 @@ export default function PlayersPage() {
                 </div>
                 <span className="countBadge">{names.length}</span>
               </div>
+              <form className="stack compact" onSubmit={handleSubmit}>
+                <div className="row">
+                  <input
+                    value={nameInput}
+                    onChange={(e) => setNameInput(e.target.value)}
+                    placeholder="Enter player name"
+                    className="input"
+                  />
+                  <button type="submit" className="button">
+                    Add
+                  </button>
+                </div>
+              </form>
               {names.length ? (
                 <ol className="rosterList">
                   {names.map((name, index) => (
@@ -132,20 +145,6 @@ export default function PlayersPage() {
               <p className="muted">Set the highest number of cards dealt in a round.</p>
             </section>
           </div>
-
-          <form className="stack compact" onSubmit={handleSubmit}>
-            <div className="row">
-              <input
-                value={nameInput}
-                onChange={(e) => setNameInput(e.target.value)}
-                placeholder="Enter player name"
-                className="input"
-              />
-              <button type="submit" className="button">
-                Add
-              </button>
-            </div>
-          </form>
 
           {error ? <p className="error">{error}</p> : null}
 
