@@ -490,49 +490,53 @@ export default function ScoreboardPage() {
                             <strong>{name}</strong>
                             {isDealer ? <span className="dealerTag">Dealer</span> : null}
                           </div>
-                          <div className={`controlCluster ${isActiveRound && roundPhase === 'bidding' ? 'focus' : ''}`}>
-                            <span className="controlLabel">Bid</span>
-                            <div className="stepper">
-                              <button
-                                onClick={() => setValue(roundIndex, name, 'bids', -1, max)}
-                                disabled={!canEditBid}
-                              >
-                                -
-                              </button>
-                              <strong>{bid}</strong>
-                              <button
-                                onClick={() => setValue(roundIndex, name, 'bids', 1, max)}
-                                disabled={!canEditBid}
-                              >
-                                +
-                              </button>
+                          <div className="playerRoundControls">
+                            <div className={`controlCluster ${isActiveRound && roundPhase === 'bidding' ? 'focus' : ''}`}>
+                              <span className="controlLabel">Bid</span>
+                              <div className="stepper">
+                                <button
+                                  onClick={() => setValue(roundIndex, name, 'bids', -1, max)}
+                                  disabled={!canEditBid}
+                                >
+                                  -
+                                </button>
+                                <strong>{bid}</strong>
+                                <button
+                                  onClick={() => setValue(roundIndex, name, 'bids', 1, max)}
+                                  disabled={!canEditBid}
+                                >
+                                  +
+                                </button>
+                              </div>
+                            </div>
+                            <div className={`controlCluster ${isActiveRound && roundPhase === 'playing' ? 'focus' : ''}`}>
+                              <span className="controlLabel">Got</span>
+                              <div className="stepper">
+                                <button
+                                  onClick={() => setValue(roundIndex, name, 'tricks', -1, max)}
+                                  disabled={!canEditGot}
+                                >
+                                  -
+                                </button>
+                                <strong>{got}</strong>
+                                <button
+                                  onClick={() => setValue(roundIndex, name, 'tricks', 1, max)}
+                                  disabled={!canEditGot}
+                                >
+                                  +
+                                </button>
+                              </div>
                             </div>
                           </div>
-                          <div className={`controlCluster ${isActiveRound && roundPhase === 'playing' ? 'focus' : ''}`}>
-                            <span className="controlLabel">Got</span>
-                            <div className="stepper">
-                              <button
-                                onClick={() => setValue(roundIndex, name, 'tricks', -1, max)}
-                                disabled={!canEditGot}
-                              >
-                                -
-                              </button>
-                              <strong>{got}</strong>
-                              <button
-                                onClick={() => setValue(roundIndex, name, 'tricks', 1, max)}
-                                disabled={!canEditGot}
-                              >
-                                +
-                              </button>
+                          <div className="playerRoundScores">
+                            <div className="scoreMeta">
+                              <span className="controlLabel">Round</span>
+                              <strong>{roundScore === undefined ? '-' : formatSignedScore(roundScore)}</strong>
                             </div>
-                          </div>
-                          <div className="scoreMeta">
-                            <span className="controlLabel">Round</span>
-                            <strong>{roundScore === undefined ? '-' : formatSignedScore(roundScore)}</strong>
-                          </div>
-                          <div className="scoreMeta">
-                            <span className="controlLabel">Total</span>
-                            <strong>{runningTotal}</strong>
+                            <div className="scoreMeta">
+                              <span className="controlLabel">Total</span>
+                              <strong>{runningTotal}</strong>
+                            </div>
                           </div>
                         </div>
                       )
