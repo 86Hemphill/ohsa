@@ -23,6 +23,14 @@ function formatSignedScore(score) {
   return `${score}`
 }
 
+function getOrdinal(rank) {
+  if (rank % 100 >= 11 && rank % 100 <= 13) return `${rank}th`
+  if (rank % 10 === 1) return `${rank}st`
+  if (rank % 10 === 2) return `${rank}nd`
+  if (rank % 10 === 3) return `${rank}rd`
+  return `${rank}th`
+}
+
 function getBidOrder(players, dealer) {
   const dealerIndex = players.indexOf(dealer)
   if (dealerIndex === -1) return players
@@ -35,6 +43,25 @@ function getBidOrder(players, dealer) {
 function getNextBidder(entry, players) {
   const bidOrder = getBidOrder(players, entry.dealer)
   return bidOrder.find((player) => !hasRecordedValue(entry, 'bids', player)) || null
+}
+
+function getPlacings(players, totals) {
+  const ordered = [...players].sort((a, b) => (totals[b] || 0) - (totals[a] || 0))
+  let previousScore = null
+  let previousRank = 0
+
+  return ordered.map((name, index) => {
+    const score = totals[name] || 0
+    const rank = score === previousScore ? previousRank : index + 1
+    previousScore = score
+    previousRank = rank
+    return {
+      name,
+      score,
+      rank,
+      label: getOrdinal(rank),
+    }
+  })
 }
 
 export default function ScoreboardPage() {
@@ -94,7 +121,7 @@ export default function ScoreboardPage() {
     ? game.names.reduce((sum, name) => sum + toNumber(activeRound.tricks?.[name]), 0)
     : 0
   const nextBidder = activeRound ? getNextBidder(activeRound, game.names) : null
-  const biddingLockedTo = nextBidder
+  const currentRoundPlacement = getPlacings(game.names, board.totals)
   const dealerRestrictedBid =
     activeRound && rules.screwTheDealer && nextBidder === activeRound.dealer
       ? activeRound.cards -
@@ -110,9 +137,8 @@ export default function ScoreboardPage() {
     const next = Math.min(maxForRound, Math.max(0, current + delta))
     const isActiveRound = roundIndex === activeRoundIndex
 
-    if (field === 'bids' && isActiveRound && biddingLockedTo && player !== biddingLockedTo) {
-      setWarning(`It is ${biddingLockedTo}'s turn to bid.`)
-      return
+    if (field === 'bids' && isActiveRound && nextBidder && player !== nextBidder) {
+      setWarning(`Bid order reminder: ${nextBidder} is next to bid.`)
     }
 
     if (field === 'bids' && isActiveRound && rules.screwTheDealer && player === round.dealer) {
@@ -121,13 +147,16 @@ export default function ScoreboardPage() {
         .reduce((sum, name) => sum + toNumber(round.bids?.[name]), 0)
       if (next === round.cards - totalWithoutDealer) {
         setWarning(`Screw the Dealer is On. ${player} can't say ${next}.`)
-        return
       }
     }
 
     round[field][player] = next
     window.localStorage.setItem('ohsa-game', JSON.stringify(clone))
-    setWarning('')
+    if (!(field === 'bids' && isActiveRound && rules.screwTheDealer && player === round.dealer)) {
+      if (!(field === 'bids' && isActiveRound && nextBidder && player !== nextBidder)) {
+        setWarning('')
+      }
+    }
     setVersion((v) => v + 1)
   }
 
@@ -170,9 +199,7 @@ export default function ScoreboardPage() {
               <p className="muted">
                 {rules.scoringMethod === 'competitive' ? 'Competitive Scoring' : 'Classic Scoring'}
               </p>
-              <p className="muted">
-                Screw the Dealer is {rules.screwTheDealer ? 'On' : 'Off'} {rules.screwTheDealer ? '✓' : '✕'}
-              </p>
+              <p className="muted">Screw the Dealer is {rules.screwTheDealer ? 'On' : 'Off'}</p>
             </div>
             <div className="row wrap">
               <Link href="/rules" className="button secondary">
@@ -212,9 +239,6 @@ export default function ScoreboardPage() {
               </div>
             </div>
           ) : null}
-          {dealerRestrictedBid !== null && dealerRestrictedBid >= 0 ? (
-            <p className="muted">Dealer restriction: {activeRound.dealer} can't say {dealerRestrictedBid}.</p>
-          ) : null}
           {warning ? <p className="error">{warning}</p> : null}
         </div>
       </div>
@@ -235,6 +259,9 @@ export default function ScoreboardPage() {
                   <div className="roundMeta">
                     <strong>{entry.cards} cards</strong>
                     <span className="muted smallText">Dealer: {entry.dealer}</span>
+                    {roundIndex === activeRoundIndex && dealerRestrictedBid !== null && dealerRestrictedBid >= 0 ? (
+                      <span className="roundNote">Dealer can't say {dealerRestrictedBid}</span>
+                    ) : null}
                     <span className={roundIndex === activeRoundIndex ? 'roundBadge active' : 'roundBadge'}>
                       {board.rounds[roundIndex].complete
                         ? 'Done'
@@ -251,18 +278,20 @@ export default function ScoreboardPage() {
                   const isDealer = entry.dealer === name
                   const roundScore = board.rounds[roundIndex].scores?.[name]?.roundScore
                   const runningTotal = board.rounds[roundIndex].totals?.[name]
-                  const bidDisabled =
-                    roundIndex === activeRoundIndex && biddingLockedTo && biddingLockedTo !== name
+                  const isNextBidder = roundIndex === activeRoundIndex && nextBidder === name
 
                   return (
-                    <td key={`${name}-${roundIndex}`}>
+                    <td
+                      key={`${name}-${roundIndex}`}
+                      className={isNextBidder ? 'activeBidderCell' : undefined}
+                    >
                       <div className="cellControl">
                         <span>{isDealer ? 'Bid (D):' : 'Bid:'} {bid ?? '-'}</span>
                         <div>
-                          <button disabled={bidDisabled} onClick={() => setValue(roundIndex, name, 'bids', -1, max)}>
+                          <button onClick={() => setValue(roundIndex, name, 'bids', -1, max)}>
                             -
                           </button>
-                          <button disabled={bidDisabled} onClick={() => setValue(roundIndex, name, 'bids', 1, max)}>
+                          <button onClick={() => setValue(roundIndex, name, 'bids', 1, max)}>
                             +
                           </button>
                         </div>
@@ -275,6 +304,7 @@ export default function ScoreboardPage() {
                         <span className="runningTotal">
                           Total: {runningTotal === undefined ? board.totals[name] || 0 : runningTotal}
                         </span>
+                        {isNextBidder ? <span className="turnHint">Next to bid</span> : null}
                       </div>
                     </td>
                   )
@@ -284,10 +314,19 @@ export default function ScoreboardPage() {
           </tbody>
           <tfoot>
             <tr>
-              <th className="stickyLeft">Total</th>
-              {game.names.map((name) => (
-                <th key={`total-${name}`}>{board.totals[name] || 0}</th>
-              ))}
+              <th className="stickyLeft">Final</th>
+              {game.names.map((name) => {
+                const placing = currentRoundPlacement.find((entry) => entry.name === name)
+                return (
+                  <th key={`total-${name}`}>
+                    <div className="totalSummary">
+                      <span>{name}</span>
+                      <strong>{board.totals[name] || 0}</strong>
+                      <span className="totalPlace">{placing?.label || '-'}</span>
+                    </div>
+                  </th>
+                )
+              })}
             </tr>
           </tfoot>
         </table>

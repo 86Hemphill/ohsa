@@ -390,6 +390,11 @@ p {
   gap: 0.35rem;
 }
 
+.roundNote {
+  color: #8ae7d7;
+  font-size: 0.78rem;
+}
+
 .roundBadge {
   display: inline-flex;
   justify-content: center;
@@ -429,6 +434,26 @@ p {
 
 .runningTotal {
   color: #9fc4be;
+  font-size: 0.78rem;
+}
+
+.turnHint {
+  color: #8ae7d7;
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+
+.activeBidderCell {
+  box-shadow: inset 0 0 0 1px rgba(101, 221, 199, 0.38);
+}
+
+.totalSummary {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.totalPlace {
+  color: #8ae7d7;
   font-size: 0.78rem;
 }
 
