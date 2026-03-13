@@ -48,6 +48,7 @@ export default function PlayersPage() {
         <div className="panel stack roomy">
           <div>
             <h2>Players</h2>
+            <p className="muted">Add players in order of play, starting with the dealer for round 1.</p>
           </div>
 
           <section className="rosterPanel">
