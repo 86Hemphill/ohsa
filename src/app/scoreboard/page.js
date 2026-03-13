@@ -188,7 +188,7 @@ export default function ScoreboardPage() {
   const gotTotal = activeRound
     ? game.names.reduce((sum, name) => sum + toNumber(activeRound.tricks?.[name]), 0)
     : 0
-  const overUnderTotal = gotTotal - bidTotal
+  const bidDeltaFromRound = activeRound ? bidTotal - activeRound.cards : 0
   const activePhase = activeRound?.phase || 'bidding'
   const placings = getPlacings(game.names, board.totals)
   const exactBidStats = getExactBidStats(game.names, entries)
@@ -588,8 +588,12 @@ export default function ScoreboardPage() {
                       <span>Dealer {entry.dealer}</span>
                       {isActiveRound && !gameFinished ? (
                         <>
-                          <span>Bid {bidTotal}</span>
-                          {roundPhase === 'playing' ? <span>{getBidDeltaLabel(overUnderTotal)}</span> : null}
+                          <span>{getBidDeltaLabel(bidDeltaFromRound)}</span>
+                          {roundPhase === 'playing' ? (
+                            <span>
+                              Tricks {gotTotal} / {entry.cards}
+                            </span>
+                          ) : null}
                         </>
                       ) : null}
                     </div>
