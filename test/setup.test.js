@@ -1,7 +1,14 @@
 const test = require('node:test')
 const assert = require('node:assert/strict')
 
-const { GAME_STATUS, createCardSequence, getDealerForRound, createGameEntries, createRematchGame } = require('../src/game/setup')
+const {
+  GAME_STATUS,
+  createCardSequence,
+  getDealerForRound,
+  createGameEntries,
+  hasGameProgress,
+  createRematchGame,
+} = require('../src/game/setup')
 
 test('createCardSequence builds a down and up round order', () => {
   assert.deepEqual(createCardSequence(3), [3, 2, 1, 2, 3])
@@ -32,6 +39,40 @@ test('createGameEntries respects the double one-card round option', () => {
   assert.deepEqual(
     entries.map((entry) => entry.cards),
     [2, 1, 1, 2]
+  )
+})
+
+test('hasGameProgress returns false until the game has actually progressed', () => {
+  assert.equal(
+    hasGameProgress({
+      entries: [
+        { bids: {}, tricks: {} },
+        { bids: { Ava: 0, Bo: 0 }, tricks: { Ava: 0, Bo: 0 } },
+      ],
+    }),
+    false
+  )
+
+  assert.equal(
+    hasGameProgress({
+      entries: [{ bids: { Ava: 1, Bo: 0 }, tricks: { Ava: 0, Bo: 0 } }],
+    }),
+    true
+  )
+
+  assert.equal(
+    hasGameProgress({
+      progressed: true,
+      entries: [{ bids: {}, tricks: {} }],
+    }),
+    true
+  )
+
+  assert.equal(
+    hasGameProgress({
+      entries: [{ bids: {}, tricks: {} }],
+    }),
+    false
   )
 })
 

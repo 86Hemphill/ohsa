@@ -1,7 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import setup from '../../game/setup'
+
+const { hasGameProgress } = setup
 
 export default function PlayersPage() {
   const [nameInput, setNameInput] = useState('')
@@ -9,6 +12,21 @@ export default function PlayersPage() {
   const [maxCards, setMaxCards] = useState(7)
   const [error, setError] = useState('')
   const router = useRouter()
+
+  useEffect(() => {
+    const stored = window.localStorage.getItem('ohsa-game')
+    if (!stored) return
+
+    const parsed = JSON.parse(stored)
+    if (!Array.isArray(parsed.names) || hasGameProgress(parsed)) {
+      return
+    }
+
+    setNames(parsed.names)
+    if (Number.isInteger(parsed.maxCards) && parsed.maxCards > 0) {
+      setMaxCards(parsed.maxCards)
+    }
+  }, [])
 
   const addPlayer = () => {
     const trimmed = nameInput.trim()
@@ -49,7 +67,15 @@ export default function PlayersPage() {
       return
     }
 
-    const game = { names, maxCards: n }
+    const stored = window.localStorage.getItem('ohsa-game')
+    const parsed = stored ? JSON.parse(stored) : null
+    const game = {
+      ...(parsed && !hasGameProgress(parsed) ? parsed : {}),
+      names,
+      maxCards: n,
+      progressed: false,
+      status: 'in_progress',
+    }
     window.localStorage.setItem('ohsa-game', JSON.stringify(game))
     router.push('/rules')
   }

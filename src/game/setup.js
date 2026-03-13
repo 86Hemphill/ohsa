@@ -46,6 +46,21 @@ function createGameEntries(players, maxCards, options = {}) {
   }))
 }
 
+function hasGameProgress(game) {
+  if (game?.progressed) {
+    return true
+  }
+
+  return Boolean(
+    game?.entries?.some(
+      (entry) =>
+        Object.values(entry.bids || {}).some((value) => Number(value) !== 0) ||
+        Object.values(entry.tricks || {}).some((value) => Number(value) !== 0) ||
+        entry.phase === 'playing'
+    )
+  )
+}
+
 function createRematchGame(game) {
   if (!game || typeof game !== 'object') {
     throw new Error('game is required')
@@ -62,6 +77,7 @@ function createRematchGame(game) {
     names: [...game.names],
     maxCards: game.maxCards,
     rules,
+    progressed: false,
     status: GAME_STATUS.IN_PROGRESS,
     entries: createGameEntries(game.names, game.maxCards, {
       playSingleCardRoundTwice: Boolean(rules.playSingleCardRoundTwice),
@@ -74,5 +90,6 @@ module.exports = {
   createCardSequence,
   getDealerForRound,
   createGameEntries,
+  hasGameProgress,
   createRematchGame,
 }

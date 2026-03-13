@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import setup from '../../game/setup'
 
-const { createGameEntries } = setup
+const { createGameEntries, hasGameProgress } = setup
 
 export default function RulesPage() {
   const router = useRouter()
@@ -14,11 +14,7 @@ export default function RulesPage() {
     return stored ? JSON.parse(stored) : null
   }, [])
   const hasStartedGame = Boolean(game?.entries?.length)
-  const hasProgress = Boolean(
-    game?.entries?.some(
-      (entry) => Object.keys(entry.bids || {}).length > 0 || Object.keys(entry.tricks || {}).length > 0
-    )
-  )
+  const hasProgress = hasGameProgress(game)
   const [scoringMethod, setScoringMethod] = useState(game?.rules?.scoringMethod || 'classic')
   const [screwTheDealer, setScrewTheDealer] = useState(Boolean(game?.rules?.screwTheDealer))
   const [playSingleCardRoundTwice, setPlaySingleCardRoundTwice] = useState(
@@ -27,7 +23,7 @@ export default function RulesPage() {
   const [error, setError] = useState('')
 
   const startGame = () => {
-    if (hasStartedGame) {
+    if (hasProgress) {
       router.push('/scoreboard')
       return
     }
@@ -44,6 +40,7 @@ export default function RulesPage() {
 
     const nextGame = {
       ...game,
+      progressed: false,
       rules: {
         scoringMethod,
         screwTheDealer,
@@ -73,7 +70,7 @@ export default function RulesPage() {
                 <button
                   type="button"
                   className={scoringMethod === 'classic' ? 'choiceCard active' : 'choiceCard'}
-                  disabled={hasStartedGame}
+                  disabled={hasProgress}
                   onClick={() => setScoringMethod('classic')}
                 >
                   <strong>Classic</strong>
@@ -82,7 +79,7 @@ export default function RulesPage() {
                 <button
                   type="button"
                   className={scoringMethod === 'competitive' ? 'choiceCard active' : 'choiceCard'}
-                  disabled={hasStartedGame}
+                  disabled={hasProgress}
                   onClick={() => setScoringMethod('competitive')}
                 >
                   <strong>Competitive</strong>
@@ -96,7 +93,7 @@ export default function RulesPage() {
               <button
                 type="button"
                 className={screwTheDealer ? 'choiceCard toggleCard active' : 'choiceCard toggleCard'}
-                disabled={hasStartedGame}
+                disabled={hasProgress}
                 onClick={() => setScrewTheDealer((current) => !current)}
               >
                 <div className="row split">
@@ -116,7 +113,7 @@ export default function RulesPage() {
                 className={
                   playSingleCardRoundTwice ? 'choiceCard toggleCard active' : 'choiceCard toggleCard'
                 }
-                disabled={hasStartedGame}
+                disabled={hasProgress}
                 onClick={() => setPlaySingleCardRoundTwice((current) => !current)}
               >
                 <div className="row split">
@@ -150,12 +147,12 @@ export default function RulesPage() {
           <div className="row wrap">
             <button
               className="button secondary"
-              onClick={() => router.push(hasStartedGame ? '/scoreboard' : '/players')}
+              onClick={() => router.push(hasProgress ? '/scoreboard' : '/players')}
             >
               Back
             </button>
             <button className="button primary" onClick={startGame}>
-              {hasStartedGame ? 'Return to Game' : 'Start Game'}
+              {hasProgress ? 'Return to Game' : 'Start Game'}
             </button>
           </div>
         </div>

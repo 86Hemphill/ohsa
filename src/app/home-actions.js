@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import setup from '../game/setup'
 
-const { GAME_STATUS, createRematchGame } = setup
+const { GAME_STATUS, createRematchGame, hasGameProgress } = setup
 
 export default function HomeActions() {
   const [savedGame, setSavedGame] = useState(null)
@@ -23,6 +23,7 @@ export default function HomeActions() {
 
   const hasSavedGame = Boolean(savedGame)
   const isFinishedGame = savedGame?.status === GAME_STATUS.FINISHED
+  const isSetupDraft = hasSavedGame && !isFinishedGame && !hasGameProgress(savedGame)
 
   return (
     <div className="heroActions">
@@ -31,8 +32,8 @@ export default function HomeActions() {
       </Link>
       {hasSavedGame ? (
         <>
-          <Link href="/scoreboard" className="button secondary">
-            {isFinishedGame ? 'View Final Results' : 'Resume Saved Game'}
+          <Link href={isSetupDraft ? '/rules' : '/scoreboard'} className="button secondary">
+            {isFinishedGame ? 'View Final Results' : isSetupDraft ? 'Resume Setup' : 'Resume Saved Game'}
           </Link>
           {isFinishedGame ? (
             <button type="button" className="button secondary" onClick={startRematch}>

@@ -211,6 +211,8 @@ export default function ScoreboardPage() {
     }
 
     round[field][player] = next
+    clone.progressed = true
+    clone.status = GAME_STATUS.IN_PROGRESS
     window.localStorage.setItem('ohsa-game', JSON.stringify(clone))
     setWarning(nextWarning)
     setVersion((v) => v + 1)
@@ -281,6 +283,7 @@ export default function ScoreboardPage() {
 
   const setRoundPhase = (roundIndex, phase) => {
     const clone = structuredClone(game)
+    clone.progressed = true
     clone.status = GAME_STATUS.IN_PROGRESS
     clone.entries[roundIndex].phase = phase
     window.localStorage.setItem('ohsa-game', JSON.stringify(clone))
