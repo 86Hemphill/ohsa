@@ -23,6 +23,25 @@ const scoringNotes = [
   },
 ]
 
+const traditionalRules = [
+  {
+    title: 'Goal',
+    body: 'Call how many tricks you expect to win, then try to hit that number exactly.',
+  },
+  {
+    title: 'Bidding order',
+    body: 'Bidding usually starts to the dealer’s left, and the dealer bids last.',
+  },
+  {
+    title: 'Trick-taking',
+    body: 'Players follow suit if they can. Highest card of the led suit wins unless a trump suit is being used.',
+  },
+  {
+    title: 'House rules vary',
+    body: 'Oh Hell has many local variations. This app supports a practical subset of the most common ones.',
+  },
+]
+
 const faqItems = [
   {
     question: 'How does dealer order work?',
@@ -31,7 +50,7 @@ const faqItems = [
   {
     question: 'What does Screw the Dealer do in this app?',
     answer:
-      'When Screw the Dealer is on, the dealer cannot make the total bids equal the number of cards dealt. Illegal dealer bids are blocked before play can start.',
+      'When Screw the Dealer is on, the dealer cannot make the total bids equal the cards dealt for that round. Illegal dealer bids are blocked before play can start.',
   },
   {
     question: 'When is a round complete?',
@@ -53,6 +72,11 @@ const faqItems = [
     answer:
       'The app saves a final-results view with standings, round history, and actions for rematch, reopen, or clearing the saved game.',
   },
+  {
+    question: 'Does this page replace a full rulebook?',
+    answer:
+      'No. It gives a solid overview of common Oh Hell play plus the exact rules this app supports, without trying to document every house variation.',
+  },
 ]
 
 export default function HowToPlayPage() {
@@ -64,7 +88,7 @@ export default function HowToPlayPage() {
             <p className="eyebrow">Guide</p>
             <h1>How to Play</h1>
             <p className="muted">
-              This page covers how the app works and how the supported Oh Hell rule options behave.
+              A practical guide to common Oh Hell rules and the way this scorekeeper handles them.
             </p>
           </div>
           <div className="row wrap helpActions">
@@ -80,8 +104,27 @@ export default function HowToPlayPage() {
         <div className="helpGrid">
           <section className="panel stack roomy">
             <div>
-              <p className="eyebrow">Setup Flow</p>
-              <h2>Start a Game</h2>
+              <p className="eyebrow">Traditional Rules</p>
+              <h2>How Oh Hell Is Commonly Played</h2>
+              <p className="muted">
+                These are the core ideas most tables use. Exact details can vary by house rules.
+              </p>
+            </div>
+            <div className="faqGrid">
+              {traditionalRules.map((item) => (
+                <article key={item.title} className="faqCard">
+                  <strong>{item.title}</strong>
+                  <p className="muted">{item.body}</p>
+                </article>
+              ))}
+            </div>
+          </section>
+
+          <section className="panel stack roomy">
+            <div>
+              <p className="eyebrow">App Flow</p>
+              <h2>Start a Game in This App</h2>
+              <p className="muted">This is the fastest way to get a table running inside the app.</p>
             </div>
             <ol className="helpList">
               {setupSteps.map((step) => (
@@ -94,6 +137,7 @@ export default function HowToPlayPage() {
             <div>
               <p className="eyebrow">Scoring</p>
               <h2>Supported Methods</h2>
+              <p className="muted">The app supports two scoring styles that cover the most common tables we discussed.</p>
             </div>
             <div className="faqGrid">
               {scoringNotes.map((item) => (
@@ -114,16 +158,16 @@ export default function HowToPlayPage() {
           <div className="faqGrid">
             <article className="faqCard">
               <strong>Bid first</strong>
-              <p className="muted">The active round starts in bidding mode. Enter bids for the table before starting play.</p>
+              <p className="muted">Each round opens in bidding mode. Enter the table’s bids before switching to play.</p>
             </article>
             <article className="faqCard">
               <strong>Track tricks</strong>
-              <p className="muted">Once play starts, record how many tricks each player actually got.</p>
+              <p className="muted">After the hand is played, record how many tricks each player actually got.</p>
             </article>
             <article className="faqCard">
               <strong>Let totals close the round</strong>
               <p className="muted">
-                The app advances only when total tricks match the number of cards dealt for that round.
+                A round only closes when the total tricks recorded matches the cards dealt for that round.
               </p>
             </article>
           </div>
@@ -141,6 +185,34 @@ export default function HowToPlayPage() {
                 <p className="muted">{item.answer}</p>
               </article>
             ))}
+          </div>
+        </section>
+
+        <section className="panel stack roomy">
+          <div>
+            <p className="eyebrow">Sources</p>
+            <h2>External References</h2>
+            <p className="muted">These references informed the general gameplay section.</p>
+          </div>
+          <div className="faqGrid">
+            <article className="faqCard">
+              <strong>Pagat: Oh Hell</strong>
+              <a href="https://www.pagat.com/exact/ohhell.html" target="_blank" rel="noreferrer">
+                pagat.com/exact/ohhell.html
+              </a>
+            </article>
+            <article className="faqCard">
+              <strong>BoardGameGeek Wiki</strong>
+              <a href="https://boardgamegeek.com/wiki/page/thing%3A1116" target="_blank" rel="noreferrer">
+                boardgamegeek.com/wiki/page/thing:1116
+              </a>
+            </article>
+            <article className="faqCard">
+              <strong>BoardGameGeek Entry</strong>
+              <a href="https://boardgamegeek.com/boardgame/1116/oh-hell" target="_blank" rel="noreferrer">
+                boardgamegeek.com/boardgame/1116/oh-hell
+              </a>
+            </article>
           </div>
         </section>
       </div>
