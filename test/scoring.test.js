@@ -125,6 +125,18 @@ test('isRoundComplete returns false when a round is still missing values', () =>
   )
 })
 
+test('isRoundComplete returns false when tricks do not add up to the cards dealt', () => {
+  assert.equal(
+    isRoundComplete({
+      players: ['Ava', 'Bo'],
+      bids: { Ava: 1, Bo: 0 },
+      tricks: { Ava: 1, Bo: 1 },
+      cards: 1,
+    }),
+    false
+  )
+})
+
 test('buildScoreboardProgress skips incomplete rounds in totals', () => {
   const board = buildScoreboardProgress({
     players: ['Ava', 'Bo'],
@@ -132,10 +144,12 @@ test('buildScoreboardProgress skips incomplete rounds in totals', () => {
       {
         bids: { Ava: 1, Bo: 0 },
         tricks: { Ava: 1, Bo: 0 },
+        cards: 1,
       },
       {
         bids: { Ava: 2 },
         tricks: {},
+        cards: 3,
       },
     ],
   })

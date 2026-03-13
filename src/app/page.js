@@ -16,8 +16,7 @@ export default function HomePage() {
           />
         </div>
         <div className="heroCopy">
-          <p className="eyebrow">Mobile Scorekeeper</p>
-          <h1>Oh Hell Score App</h1>
+          <h1 className="heroTitle">Mobile Scorekeeper</h1>
           <p className="heroLead">
             Keep rounds moving, track bids and tricks cleanly, and keep the full table on the same
             page.
