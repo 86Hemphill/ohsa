@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import scoring from '../../game/scoring'
@@ -31,18 +31,6 @@ function getOrdinal(rank) {
   return `${rank}th`
 }
 
-function getBidOrder(players, dealer) {
-  const dealerIndex = players.indexOf(dealer)
-  if (dealerIndex === -1) return players
-
-  return players.slice(dealerIndex + 1).concat(players.slice(0, dealerIndex + 1))
-}
-
-function getNextBidder(entry, players) {
-  const bidOrder = getBidOrder(players, entry.dealer)
-  return bidOrder.find((player) => !hasRecordedValue(entry, 'bids', player)) || null
-}
-
 function getPlacings(players, totals) {
   const ordered = [...players].sort((a, b) => (totals[b] || 0) - (totals[a] || 0))
   let previousScore = null
@@ -67,6 +55,10 @@ function getRoundState(entry, players, progress) {
     (player) => hasRecordedValue(entry, 'bids', player) || hasRecordedValue(entry, 'tricks', player)
   )
   return hasAnyInput ? 'active' : 'pending'
+}
+
+function getCardsLabel(cards) {
+  return `${cards} ${cards === 1 ? 'card' : 'cards'}`
 }
 
 export default function ScoreboardPage() {
@@ -133,15 +125,42 @@ export default function ScoreboardPage() {
   const gotTotal = activeRound
     ? game.names.reduce((sum, name) => sum + toNumber(activeRound.tricks?.[name]), 0)
     : 0
-  const nextBidder = activeRound ? getNextBidder(activeRound, game.names) : null
+  const activePhase = activeRound?.phase || 'bidding'
   const placings = getPlacings(game.names, board.totals)
   const dealerRestrictedBid =
-    activeRound && rules.screwTheDealer && nextBidder === activeRound.dealer
+    activeRound && rules.screwTheDealer && activePhase === 'bidding'
       ? activeRound.cards -
         game.names
           .filter((name) => name !== activeRound.dealer)
           .reduce((sum, name) => sum + toNumber(activeRound.bids?.[name]), 0)
       : null
+
+  useEffect(() => {
+    if (!game || activeRoundIndex < 0 || !game.entries?.[activeRoundIndex]) return
+
+    const currentEntry = game.entries[activeRoundIndex]
+    const zeroBids = {}
+    const zeroTricks = {}
+    let needsUpdate = !currentEntry.phase
+
+    for (const name of game.names) {
+      zeroBids[name] = toNumber(currentEntry.bids?.[name])
+      zeroTricks[name] = toNumber(currentEntry.tricks?.[name])
+
+      if (!hasRecordedValue(currentEntry, 'bids', name) || !hasRecordedValue(currentEntry, 'tricks', name)) {
+        needsUpdate = true
+      }
+    }
+
+    if (!needsUpdate) return
+
+    const clone = structuredClone(game)
+    clone.entries[activeRoundIndex].bids = zeroBids
+    clone.entries[activeRoundIndex].tricks = zeroTricks
+    clone.entries[activeRoundIndex].phase = clone.entries[activeRoundIndex].phase || 'bidding'
+    window.localStorage.setItem('ohsa-game', JSON.stringify(clone))
+    setVersion((v) => v + 1)
+  }, [activeRoundIndex, game])
 
   const setValue = (roundIndex, player, field, delta, maxForRound) => {
     const clone = structuredClone(game)
@@ -149,28 +168,29 @@ export default function ScoreboardPage() {
     const current = hasRecordedValue(round, field, player) ? toNumber(round[field][player]) : 0
     const next = Math.min(maxForRound, Math.max(0, current + delta))
     const isActiveRound = roundIndex === activeRoundIndex
+    const roundPhase = round.phase || 'bidding'
     let nextWarning = ''
 
     if (
       field === 'bids' &&
       isActiveRound &&
+      roundPhase === 'bidding' &&
       player === round.dealer &&
       round.cards > 1 &&
-      game.names.filter((name) => name !== player).every((name) => !hasRecordedValue(round, 'bids', name))
+      next > 0 &&
+      game.names.filter((name) => name !== player).every((name) => toNumber(round.bids?.[name]) === 0)
     ) {
       setWarning('The dealer bids last unless it is a one-card round.')
       return
     }
 
-    if (field === 'bids' && isActiveRound && nextBidder && player !== nextBidder) {
-      const playerAlreadyBid = hasRecordedValue(round, 'bids', player)
-      if (!playerAlreadyBid) {
-        nextWarning = `Bid order reminder: ${nextBidder} is next to bid.`
-      }
+    if (field === 'tricks' && roundPhase !== 'playing') {
+      setWarning('Start play before recording tricks.')
+      return
     }
 
     if (field === 'bids' && isActiveRound && rules.screwTheDealer && player === round.dealer) {
-      const totalWithoutDealer = game.names
+      const totalWithoutDealer = clone.names
         .filter((name) => name !== player)
         .reduce((sum, name) => sum + toNumber(round.bids?.[name]), 0)
       if (next === round.cards - totalWithoutDealer) {
@@ -214,6 +234,14 @@ export default function ScoreboardPage() {
     }))
   }
 
+  const setRoundPhase = (roundIndex, phase) => {
+    const clone = structuredClone(game)
+    clone.entries[roundIndex].phase = phase
+    window.localStorage.setItem('ohsa-game', JSON.stringify(clone))
+    setWarning('')
+    setVersion((v) => v + 1)
+  }
+
   return (
     <main className="screen wide">
       <div className="stack wideStack scoreboardShell">
@@ -225,7 +253,7 @@ export default function ScoreboardPage() {
                 <h2>Scoreboard</h2>
                 {activeRound ? (
                   <p className="muted">
-                    Round {activeRoundIndex + 1} of {entries.length} - {activeRound.cards} cards
+                    Round {activeRoundIndex + 1} of {entries.length} - {getCardsLabel(activeRound.cards)}
                   </p>
                 ) : null}
               </div>
@@ -259,8 +287,8 @@ export default function ScoreboardPage() {
                 <strong>{activeRound.dealer}</strong>
               </div>
               <div className="statusCard">
-                <span className="statusLabel">Next bid</span>
-                <strong>{nextBidder || 'Bidding complete'}</strong>
+                <span className="statusLabel">Round state</span>
+                <strong>{activePhase === 'playing' ? 'Play' : 'Bid'}</strong>
               </div>
               <div className="statusCard">
                 <span className="statusLabel">Bid total</span>
@@ -294,10 +322,13 @@ export default function ScoreboardPage() {
             const roundState = getRoundState(entry, game.names, roundProgress)
             const isActiveRound = roundIndex === activeRoundIndex
             const isExpanded = roundState !== 'complete' || expandedRounds[roundIndex]
+            const roundPhase = entry.phase || 'bidding'
             const rowNote =
-              isActiveRound && dealerRestrictedBid !== null && dealerRestrictedBid >= 0
+              isActiveRound && roundPhase === 'bidding' && dealerRestrictedBid !== null && dealerRestrictedBid >= 0
                 ? `Dealer can't say ${dealerRestrictedBid}`
                 : null
+            const roundStateLabel =
+              roundState === 'complete' ? 'Done' : isActiveRound ? (roundPhase === 'playing' ? 'Play' : 'Bid') : 'Next'
 
             return (
               <article key={`${entry.cards}-${roundIndex}`} className={`roundCard ${roundState}`}>
@@ -305,18 +336,25 @@ export default function ScoreboardPage() {
                   <div className="roundHeaderMain">
                     <h3>
                       Round {roundIndex + 1}
-                      <span className="roundHeaderMeta">
-                        {entry.cards} cards
-                        <span className="roundMetaDivider">/</span>
-                        Dealer {entry.dealer}
-                      </span>
                     </h3>
+                    <div className="roundHeaderMeta">
+                      <span className="roundCardCount">{getCardsLabel(entry.cards)}</span>
+                      <span>Dealer {entry.dealer}</span>
+                    </div>
                     {rowNote ? <p className="roundNote">{rowNote}</p> : null}
                   </div>
                   <div className="roundHeaderSide">
-                    <span className={`roundStatePill ${roundState}`}>
-                      {roundState === 'complete' ? 'Complete' : roundState === 'active' ? 'Current' : 'Upcoming'}
+                    <span className={`roundStatePill ${roundState} ${isActiveRound ? roundPhase : ''}`}>
+                      {roundStateLabel}
                     </span>
+                    {isActiveRound && roundState !== 'complete' ? (
+                      <button
+                        className="button secondary roundToggle"
+                        onClick={() => setRoundPhase(roundIndex, roundPhase === 'playing' ? 'bidding' : 'playing')}
+                      >
+                        {roundPhase === 'playing' ? 'Edit bids' : 'Start play'}
+                      </button>
+                    ) : null}
                     {roundState === 'complete' ? (
                       <button className="button secondary roundToggle" onClick={() => toggleRoundDetails(roundIndex)}>
                         {isExpanded ? 'Hide details' : 'Show details'}
@@ -349,29 +387,47 @@ export default function ScoreboardPage() {
                       const isDealer = entry.dealer === name
                       const roundScore = roundProgress.scores?.[name]?.roundScore
                       const runningTotal = roundProgress.totals?.[name] ?? board.totals[name] ?? 0
-                      const isNextBidder = isActiveRound && nextBidder === name
 
                       return (
-                        <div key={`${name}-${roundIndex}`} className={`playerRoundRow ${isNextBidder ? 'next' : ''}`}>
+                        <div key={`${name}-${roundIndex}`} className="playerRoundRow">
                           <div className="playerRoundIdentity">
                             <strong>{name}</strong>
                             {isDealer ? <span className="dealerTag">Dealer</span> : null}
-                            {isNextBidder ? <span className="turnHint">Next bid</span> : null}
                           </div>
-                          <div className="controlCluster">
+                          <div className={`controlCluster ${isActiveRound && roundPhase === 'bidding' ? 'focus' : ''}`}>
                             <span className="controlLabel">Bid</span>
                             <div className="stepper">
-                              <button onClick={() => setValue(roundIndex, name, 'bids', -1, max)}>-</button>
+                              <button
+                                onClick={() => setValue(roundIndex, name, 'bids', -1, max)}
+                                disabled={isActiveRound && roundPhase === 'playing'}
+                              >
+                                -
+                              </button>
                               <strong>{bid}</strong>
-                              <button onClick={() => setValue(roundIndex, name, 'bids', 1, max)}>+</button>
+                              <button
+                                onClick={() => setValue(roundIndex, name, 'bids', 1, max)}
+                                disabled={isActiveRound && roundPhase === 'playing'}
+                              >
+                                +
+                              </button>
                             </div>
                           </div>
-                          <div className="controlCluster">
+                          <div className={`controlCluster ${isActiveRound && roundPhase === 'playing' ? 'focus' : ''}`}>
                             <span className="controlLabel">Got</span>
                             <div className="stepper">
-                              <button onClick={() => setValue(roundIndex, name, 'tricks', -1, max)}>-</button>
+                              <button
+                                onClick={() => setValue(roundIndex, name, 'tricks', -1, max)}
+                                disabled={!isActiveRound || roundPhase !== 'playing'}
+                              >
+                                -
+                              </button>
                               <strong>{got}</strong>
-                              <button onClick={() => setValue(roundIndex, name, 'tricks', 1, max)}>+</button>
+                              <button
+                                onClick={() => setValue(roundIndex, name, 'tricks', 1, max)}
+                                disabled={!isActiveRound || roundPhase !== 'playing'}
+                              >
+                                +
+                              </button>
                             </div>
                           </div>
                           <div className="scoreMeta">
