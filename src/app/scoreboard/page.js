@@ -7,7 +7,7 @@ import scoring from '../../game/scoring'
 import setup from '../../game/setup'
 
 const { buildScoreboardProgress, normalizeRules, isRoundComplete } = scoring
-const { getDealerForRound } = setup
+const { GAME_STATUS, createRematchGame, getDealerForRound } = setup
 
 function toNumber(value) {
   const n = Number(value)
@@ -59,6 +59,11 @@ function getRoundState(entry, players, progress) {
 
 function getCardsLabel(cards) {
   return `${cards} ${cards === 1 ? 'card' : 'cards'}`
+}
+
+function isGameFinished(game, entries, currentRoundIndex) {
+  if (game?.status === GAME_STATUS.FINISHED) return true
+  return Array.isArray(entries) && entries.length > 0 && currentRoundIndex === -1
 }
 
 export default function ScoreboardPage() {
@@ -120,6 +125,7 @@ export default function ScoreboardPage() {
   )
   const activeRoundIndex = currentRoundIndex === -1 ? entries.length - 1 : currentRoundIndex
   const activeRound = entries[activeRoundIndex]
+  const gameFinished = isGameFinished(game, entries, currentRoundIndex)
   const bidTotal = activeRound
     ? game.names.reduce((sum, name) => sum + toNumber(activeRound.bids?.[name]), 0)
     : 0
@@ -129,7 +135,7 @@ export default function ScoreboardPage() {
   const activePhase = activeRound?.phase || 'bidding'
   const placings = getPlacings(game.names, board.totals)
   const dealerRestrictedBid =
-    activeRound && rules.screwTheDealer && activePhase === 'bidding'
+    activeRound && !gameFinished && rules.screwTheDealer && activePhase === 'bidding'
       ? activeRound.cards -
         game.names
           .filter((name) => name !== activeRound.dealer)
@@ -137,7 +143,7 @@ export default function ScoreboardPage() {
       : null
 
   useEffect(() => {
-    if (!game || activeRoundIndex < 0 || !game.entries?.[activeRoundIndex]) return
+    if (!game || gameFinished || activeRoundIndex < 0 || !game.entries?.[activeRoundIndex]) return
 
     const currentEntry = game.entries[activeRoundIndex]
     const zeroBids = {}
@@ -161,9 +167,14 @@ export default function ScoreboardPage() {
     clone.entries[activeRoundIndex].phase = clone.entries[activeRoundIndex].phase || 'bidding'
     window.localStorage.setItem('ohsa-game', JSON.stringify(clone))
     setVersion((v) => v + 1)
-  }, [activeRoundIndex, game])
+  }, [activeRoundIndex, game, gameFinished])
 
   const setValue = (roundIndex, player, field, delta, maxForRound) => {
+    if (gameFinished && !editingRounds[roundIndex]) {
+      setWarning('Reopen the game or edit a completed round before changing scores.')
+      return
+    }
+
     const clone = structuredClone(game)
     const round = clone.entries[roundIndex]
     const current = hasRecordedValue(round, field, player) ? toNumber(round[field][player]) : 0
@@ -210,12 +221,14 @@ export default function ScoreboardPage() {
       ...entry,
       bids: {},
       tricks: {},
+      phase: 'bidding',
     }))
 
     window.localStorage.setItem(
       'ohsa-game',
       JSON.stringify({
         ...game,
+        status: GAME_STATUS.IN_PROGRESS,
         entries: resetEntries,
       })
     )
@@ -223,7 +236,19 @@ export default function ScoreboardPage() {
     setVersion((v) => v + 1)
   }
 
-  const clearGame = () => {
+  const finishGame = () => {
+    window.localStorage.setItem(
+      'ohsa-game',
+      JSON.stringify({
+        ...game,
+        status: GAME_STATUS.FINISHED,
+      })
+    )
+    setWarning('')
+    setVersion((v) => v + 1)
+  }
+
+  const clearSavedGame = () => {
     window.localStorage.removeItem('ohsa-game')
     router.push('/')
   }
@@ -244,8 +269,30 @@ export default function ScoreboardPage() {
 
   const setRoundPhase = (roundIndex, phase) => {
     const clone = structuredClone(game)
+    clone.status = GAME_STATUS.IN_PROGRESS
     clone.entries[roundIndex].phase = phase
     window.localStorage.setItem('ohsa-game', JSON.stringify(clone))
+    setWarning('')
+    setVersion((v) => v + 1)
+  }
+
+  const reopenGame = () => {
+    window.localStorage.setItem(
+      'ohsa-game',
+      JSON.stringify({
+        ...game,
+        status: GAME_STATUS.IN_PROGRESS,
+      })
+    )
+    setWarning('')
+    setVersion((v) => v + 1)
+  }
+
+  const startRematch = () => {
+    const rematch = createRematchGame(game)
+    window.localStorage.setItem('ohsa-game', JSON.stringify(rematch))
+    setExpandedRounds({})
+    setEditingRounds({})
     setWarning('')
     setVersion((v) => v + 1)
   }
@@ -257,8 +304,8 @@ export default function ScoreboardPage() {
           <div className="row split">
             <div className="stack compact">
               <div>
-                <p className="eyebrow">Game in progress</p>
-                <h2>Scoreboard</h2>
+                <p className="eyebrow">{gameFinished ? 'Final results' : 'Game in progress'}</p>
+                <h2>{gameFinished ? 'Results' : 'Scoreboard'}</h2>
                 {activeRound ? (
                   <p className="muted">
                     Round {activeRoundIndex + 1} of {entries.length} - {getCardsLabel(activeRound.cards)}
@@ -279,16 +326,32 @@ export default function ScoreboardPage() {
               <Link href="/rules" className="button secondary">
                 View Rules
               </Link>
-              <button className="button secondary" onClick={resetGame}>
-                Reset Scores
-              </button>
-              <button className="button danger" onClick={clearGame}>
-                End Game
-              </button>
+              {gameFinished ? (
+                <>
+                  <button className="button secondary" onClick={reopenGame}>
+                    Reopen Game
+                  </button>
+                  <button className="button secondary" onClick={startRematch}>
+                    Rematch
+                  </button>
+                  <button className="button danger" onClick={clearSavedGame}>
+                    Clear Saved Game
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button className="button secondary" onClick={resetGame}>
+                    Reset Scores
+                  </button>
+                  <button className="button danger" onClick={finishGame}>
+                    Finish Game
+                  </button>
+                </>
+              )}
             </div>
           </div>
 
-          {activeRound ? (
+          {activeRound && !gameFinished ? (
             <div className="statusRow">
               <span className="statusInline">Dealer {activeRound.dealer}</span>
               <span className="statusInline">{activePhase === 'playing' ? 'Play' : 'Bid'} phase</span>
@@ -308,6 +371,13 @@ export default function ScoreboardPage() {
               </div>
             ))}
           </div>
+
+          {gameFinished ? (
+            <div className="finalSummary">
+              <p className="muted">The current standings are locked in as your saved final results.</p>
+              <p className="muted">Use Rematch to start over with the same players, rules, and card count.</p>
+            </div>
+          ) : null}
         </section>
 
         <section className="roundList">
@@ -319,14 +389,26 @@ export default function ScoreboardPage() {
             const isEditingRound = Boolean(editingRounds[roundIndex])
             const roundPhase = entry.phase || 'bidding'
             const rowNote =
-              isActiveRound && roundPhase === 'bidding' && dealerRestrictedBid !== null && dealerRestrictedBid >= 0
+              isActiveRound &&
+              !gameFinished &&
+              roundPhase === 'bidding' &&
+              dealerRestrictedBid !== null &&
+              dealerRestrictedBid >= 0
                 ? `Dealer can't say ${dealerRestrictedBid}`
                 : null
             const roundStateLabel =
-              roundState === 'complete' ? 'Done' : isActiveRound ? (roundPhase === 'playing' ? 'Play' : 'Bid') : 'Next'
-            const showRoundWarning = isActiveRound && warning
-            const canEditBid = isActiveRound ? roundPhase !== 'playing' : isEditingRound
-            const canEditGot = isActiveRound ? roundPhase === 'playing' : isEditingRound
+              roundState === 'complete'
+                ? 'Done'
+                : gameFinished
+                  ? 'Saved'
+                  : isActiveRound
+                    ? roundPhase === 'playing'
+                      ? 'Play'
+                      : 'Bid'
+                    : 'Next'
+            const showRoundWarning = isActiveRound && !gameFinished && warning
+            const canEditBid = gameFinished ? isEditingRound : isActiveRound ? roundPhase !== 'playing' : isEditingRound
+            const canEditGot = gameFinished ? isEditingRound : isActiveRound ? roundPhase === 'playing' : isEditingRound
 
             return (
               <article key={`${entry.cards}-${roundIndex}`} className={`roundCard ${roundState}`}>
@@ -338,7 +420,7 @@ export default function ScoreboardPage() {
                     <div className="roundHeaderMeta">
                       <span className="roundCardCount">{getCardsLabel(entry.cards)}</span>
                       <span>Dealer {entry.dealer}</span>
-                      {isActiveRound ? (
+                      {isActiveRound && !gameFinished ? (
                         <>
                           <span>Bid {bidTotal}</span>
                           <span>
@@ -354,7 +436,7 @@ export default function ScoreboardPage() {
                     <span className={`roundStatePill ${roundState} ${isActiveRound ? roundPhase : ''}`}>
                       {roundStateLabel}
                     </span>
-                    {isActiveRound && roundState !== 'complete' ? (
+                    {isActiveRound && !gameFinished && roundState !== 'complete' ? (
                       <button
                         className="button secondary roundToggle"
                         onClick={() => setRoundPhase(roundIndex, roundPhase === 'playing' ? 'bidding' : 'playing')}

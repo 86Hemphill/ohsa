@@ -435,6 +435,12 @@ p {
   font-weight: 700;
 }
 
+.finalSummary {
+  display: grid;
+  gap: 0.2rem;
+  padding-top: 0.15rem;
+}
+
 .roundList {
   display: grid;
   gap: 0.85rem;

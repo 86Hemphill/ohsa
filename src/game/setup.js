@@ -1,3 +1,8 @@
+const GAME_STATUS = {
+  IN_PROGRESS: 'in_progress',
+  FINISHED: 'finished',
+}
+
 function ensurePositiveInteger(value, label) {
   if (!Number.isInteger(value) || value < 1) {
     throw new Error(`${label} must be a positive whole number`)
@@ -41,8 +46,33 @@ function createGameEntries(players, maxCards, options = {}) {
   }))
 }
 
+function createRematchGame(game) {
+  if (!game || typeof game !== 'object') {
+    throw new Error('game is required')
+  }
+
+  ensurePlayers(game.names)
+  ensurePositiveInteger(game.maxCards, 'maxCards')
+
+  const rules = {
+    ...(game.rules || {}),
+  }
+
+  return {
+    names: [...game.names],
+    maxCards: game.maxCards,
+    rules,
+    status: GAME_STATUS.IN_PROGRESS,
+    entries: createGameEntries(game.names, game.maxCards, {
+      playSingleCardRoundTwice: Boolean(rules.playSingleCardRoundTwice),
+    }),
+  }
+}
+
 module.exports = {
+  GAME_STATUS,
   createCardSequence,
   getDealerForRound,
   createGameEntries,
+  createRematchGame,
 }
