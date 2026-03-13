@@ -26,6 +26,11 @@ export default function PlayersPage() {
     setError('')
   }
 
+  const handleSubmit = (event) => {
+    event.preventDefault()
+    addPlayer()
+  }
+
   const continueToCards = () => {
     if (names.length < 2) {
       setError('Add at least 2 players to start.')
@@ -39,32 +44,55 @@ export default function PlayersPage() {
 
   return (
     <main className="screen">
-      <h2>Players</h2>
-      <div className="stack">
-        <p className="muted">Add players in order of play, starting with the dealer for round 1.</p>
-        <div className="row">
-          <input
-            value={nameInput}
-            onChange={(e) => setNameInput(e.target.value)}
-            placeholder="Enter player name"
-            className="input"
-          />
-          <button onClick={addPlayer} className="button">
-            Add
+      <div className="stack appShell">
+        <div className="panel stack roomy">
+          <div>
+            <h2>Players</h2>
+            <p className="muted">Add players in order of play, starting with the dealer for round 1.</p>
+          </div>
+
+          <section className="rosterPanel">
+            <div className="row split">
+              <div>
+                <p className="eyebrow">Players</p>
+                <p className="muted">The first player listed will deal round 1.</p>
+              </div>
+              <span className="countBadge">{names.length}</span>
+            </div>
+            {names.length ? (
+              <ol className="rosterList">
+                {names.map((name, index) => (
+                  <li key={name} className="rosterItem">
+                    <span className="rosterIndex">{index + 1}</span>
+                    <span>{name}</span>
+                  </li>
+                ))}
+              </ol>
+            ) : (
+              <p className="emptyState">No players added yet.</p>
+            )}
+          </section>
+
+          <form className="stack compact" onSubmit={handleSubmit}>
+            <div className="row">
+              <input
+                value={nameInput}
+                onChange={(e) => setNameInput(e.target.value)}
+                placeholder="Enter player name"
+                className="input"
+              />
+              <button type="submit" className="button">
+                Add
+              </button>
+            </div>
+          </form>
+
+          {error ? <p className="error">{error}</p> : null}
+
+          <button onClick={continueToCards} className="button primary">
+            Continue
           </button>
         </div>
-
-        {error ? <p className="error">{error}</p> : null}
-
-        <ul className="playerList">
-          {names.map((name) => (
-            <li key={name}>{name}</li>
-          ))}
-        </ul>
-
-        <button onClick={continueToCards} className="button primary">
-          Continue
-        </button>
       </div>
     </main>
   )

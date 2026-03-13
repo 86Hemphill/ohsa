@@ -44,83 +44,75 @@ export default function RulesPage() {
 
   return (
     <main className="screen">
-      <div className="stack">
-        <div>
-          <h2>Rules</h2>
-          <p className="muted">
-            Add players in seating order starting with the dealer. The app rotates the dealer each
-            round from that order.
-          </p>
-        </div>
-
-        <section className="panel stack compact">
+      <div className="stack appShell">
+        <div className="panel stack roomy">
           <div>
-            <p className="eyebrow">Scoring</p>
-            <div className="optionList">
-              <label className="optionCard">
-                <input
-                  type="radio"
-                  name="scoring"
-                  value="classic"
-                  checked={scoringMethod === 'classic'}
-                  onChange={() => setScoringMethod('classic')}
-                />
-                <div>
+            <h2>Rules</h2>
+            <p className="muted">
+              Add players in seating order starting with the dealer. The app rotates the dealer each
+              round from that order.
+            </p>
+          </div>
+
+          <section className="stack compact">
+            <div>
+              <p className="eyebrow">Scoring</p>
+              <div className="segmentedGrid">
+                <button
+                  type="button"
+                  className={scoringMethod === 'classic' ? 'choiceCard active' : 'choiceCard'}
+                  onClick={() => setScoringMethod('classic')}
+                >
                   <strong>Classic</strong>
-                  <p className="muted">Exact bid scores 10 + tricks. Missed bids score tricks taken.</p>
-                </div>
-              </label>
-              <label className="optionCard">
-                <input
-                  type="radio"
-                  name="scoring"
-                  value="competitive"
-                  checked={scoringMethod === 'competitive'}
-                  onChange={() => setScoringMethod('competitive')}
-                />
-                <div>
+                  <span>Exact bid scores 10 + tricks. Missed bids score tricks taken.</span>
+                </button>
+                <button
+                  type="button"
+                  className={scoringMethod === 'competitive' ? 'choiceCard active' : 'choiceCard'}
+                  onClick={() => setScoringMethod('competitive')}
+                >
                   <strong>Competitive</strong>
-                  <p className="muted">Exact bid scores 10 + tricks. Missed bids lose 10 per trick off.</p>
-                </div>
-              </label>
-            </div>
-          </div>
-
-          <div>
-            <p className="eyebrow">Bidding</p>
-            <label className="optionCard">
-              <input
-                type="checkbox"
-                checked={screwTheDealer}
-                onChange={(event) => setScrewTheDealer(event.target.checked)}
-              />
-              <div>
-                <strong>Screw the Dealer</strong>
-                <p className="muted">
-                  When all bids are entered, total bids cannot equal cards dealt in that round.
-                </p>
+                  <span>Exact bid scores 10 + tricks. Missed bids lose 10 per trick off.</span>
+                </button>
               </div>
-            </label>
+            </div>
+
+            <div>
+              <p className="eyebrow">Bidding</p>
+              <button
+                type="button"
+                className={screwTheDealer ? 'choiceCard toggleCard active' : 'choiceCard toggleCard'}
+                onClick={() => setScrewTheDealer((current) => !current)}
+              >
+                <div className="row split">
+                  <strong>Screw the Dealer</strong>
+                  <span className={screwTheDealer ? 'togglePill on' : 'togglePill'}>
+                    {screwTheDealer ? 'On' : 'Off'}
+                  </span>
+                </div>
+                <span>When all bids are entered, total bids cannot equal cards dealt in that round.</span>
+              </button>
+            </div>
+          </section>
+
+          {game?.names?.length ? (
+            <div className="panel stack compact insetPanel">
+              <p className="eyebrow">Dealer Order</p>
+              <p className="muted">Round 1 dealer: {game.names[0]}</p>
+              <p className="muted">Dealer rotates in the same player order every round.</p>
+            </div>
+          ) : null}
+
+          {error ? <p className="error">{error}</p> : null}
+
+          <div className="row wrap">
+            <button className="button secondary" onClick={() => router.push('/cards')}>
+              Back
+            </button>
+            <button className="button primary" onClick={startGame}>
+              Start Game
+            </button>
           </div>
-        </section>
-
-        {game?.names?.length ? (
-          <div className="panel stack compact">
-            <p className="eyebrow">Dealer Order</p>
-            <p className="muted">Round 1 dealer: {game.names[0]}</p>
-            <p className="muted">Dealer rotates in the same player order every round.</p>
-          </div>
-        ) : null}
-
-        {error ? <p className="error">{error}</p> : null}
-
-        <div className="row wrap">
-          <button className="button secondary" onClick={() => router.push('/cards')}>
-            Back
-          </button>
-          <button className="button primary" onClick={startGame}>
-            Start Game
-          </button>
         </div>
       </div>
     </main>

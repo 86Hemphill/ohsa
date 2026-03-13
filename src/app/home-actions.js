@@ -11,9 +11,9 @@ export default function HomeActions() {
   }, [])
 
   return (
-    <div className="stack compact">
+    <div className="heroActions">
       <Link href="/players" className="button primary">
-        Start New Game
+        New Game
       </Link>
       {hasSavedGame ? (
         <Link href="/scoreboard" className="button secondary">
