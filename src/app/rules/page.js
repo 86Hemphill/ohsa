@@ -64,10 +64,6 @@ export default function RulesPage() {
         <div className="panel stack roomy">
           <div>
             <h2>Rules</h2>
-            <p className="muted">
-              Add players in seating order starting with the dealer. The app rotates the dealer each
-              round from that order.
-            </p>
           </div>
 
           <section className="stack compact">
