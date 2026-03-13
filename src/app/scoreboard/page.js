@@ -61,6 +61,12 @@ function getCardsLabel(cards) {
   return `${cards} ${cards === 1 ? 'card' : 'cards'}`
 }
 
+function formatOverUnder(value) {
+  if (value > 0) return `+${value}`
+  if (value < 0) return `${value}`
+  return 'Even'
+}
+
 function isGameFinished(game, entries, currentRoundIndex) {
   if (game?.status === GAME_STATUS.FINISHED) return true
   return Array.isArray(entries) && entries.length > 0 && currentRoundIndex === -1
@@ -132,6 +138,7 @@ export default function ScoreboardPage() {
   const gotTotal = activeRound
     ? game.names.reduce((sum, name) => sum + toNumber(activeRound.tricks?.[name]), 0)
     : 0
+  const overUnderTotal = gotTotal - bidTotal
   const activePhase = activeRound?.phase || 'bidding'
   const placings = getPlacings(game.names, board.totals)
   const dealerRestrictedBid =
@@ -358,9 +365,7 @@ export default function ScoreboardPage() {
                       {isActiveRound && !gameFinished ? (
                         <>
                           <span>Bid {bidTotal}</span>
-                          <span>
-                            Got {gotTotal} / {entry.cards}
-                          </span>
+                          <span>Over/Under {formatOverUnder(overUnderTotal)}</span>
                         </>
                       ) : null}
                     </div>
@@ -465,7 +470,7 @@ export default function ScoreboardPage() {
                           </div>
                           <div className="playerRoundScores">
                             <div className="scoreMeta">
-                              <span className="controlLabel">Round</span>
+                              <span className="controlLabel">Score</span>
                               <strong>{roundScore === undefined ? '-' : formatSignedScore(roundScore)}</strong>
                             </div>
                             <div className="scoreMeta">
