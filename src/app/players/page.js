@@ -32,6 +32,11 @@ export default function PlayersPage() {
     addPlayer()
   }
 
+  const removePlayer = (nameToRemove) => {
+    setNames((prev) => prev.filter((name) => name !== nameToRemove))
+    setError('')
+  }
+
   const continueToRules = () => {
     if (names.length < 2) {
       setError('Add at least 2 players to start.')
@@ -58,26 +63,49 @@ export default function PlayersPage() {
             <p className="muted">Add players in order of play, starting with the dealer for round 1.</p>
           </div>
 
-          <section className="rosterPanel">
-            <div className="row split">
-              <div>
-                <p className="eyebrow">Players</p>
+          <div className="setupGrid">
+            <section className="rosterPanel">
+              <div className="row split">
+                <div>
+                  <p className="eyebrow">Players</p>
+                </div>
+                <span className="countBadge">{names.length}</span>
               </div>
-              <span className="countBadge">{names.length}</span>
-            </div>
-            {names.length ? (
-              <ol className="rosterList">
-                {names.map((name, index) => (
-                  <li key={name} className="rosterItem">
-                    <span className="rosterIndex">{index + 1}</span>
-                    <span>{name}</span>
-                  </li>
-                ))}
-              </ol>
-            ) : (
-              <p className="emptyState">No players added yet.</p>
-            )}
-          </section>
+              {names.length ? (
+                <ol className="rosterList">
+                  {names.map((name, index) => (
+                    <li key={name} className="rosterItem">
+                      <span className="rosterIndex">{index + 1}</span>
+                      <span>{name}</span>
+                      <button type="button" className="rosterRemove" onClick={() => removePlayer(name)}>
+                        Remove
+                      </button>
+                    </li>
+                  ))}
+                </ol>
+              ) : (
+                <p className="emptyState">No players added yet.</p>
+              )}
+            </section>
+
+            <section className="rosterPanel">
+              <div className="row split">
+                <div>
+                  <p className="eyebrow">Max Cards</p>
+                </div>
+                <span className="countBadge">{maxCards}</span>
+              </div>
+              <input
+                id="max-cards"
+                className="input"
+                type="number"
+                min="1"
+                value={maxCards}
+                onChange={(e) => setMaxCards(e.target.value)}
+              />
+              <p className="muted">Set the highest number of cards dealt in a round.</p>
+            </section>
+          </div>
 
           <form className="stack compact" onSubmit={handleSubmit}>
             <div className="row">
@@ -92,20 +120,6 @@ export default function PlayersPage() {
               </button>
             </div>
           </form>
-
-          <div className="stack compact">
-            <label htmlFor="max-cards" className="eyebrow">
-              Max Cards
-            </label>
-            <input
-              id="max-cards"
-              className="input"
-              type="number"
-              min="1"
-              value={maxCards}
-              onChange={(e) => setMaxCards(e.target.value)}
-            />
-          </div>
 
           {error ? <p className="error">{error}</p> : null}
 
