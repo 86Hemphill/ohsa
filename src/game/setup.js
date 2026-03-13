@@ -10,12 +10,13 @@ function ensurePlayers(players) {
   }
 }
 
-function createCardSequence(maxCards) {
+function createCardSequence(maxCards, options = {}) {
   ensurePositiveInteger(maxCards, 'maxCards')
+  const playSingleCardRoundTwice = Boolean(options.playSingleCardRoundTwice)
 
   const rounds = []
   for (let i = maxCards; i >= 1; i -= 1) rounds.push(i)
-  for (let i = 2; i <= maxCards; i += 1) rounds.push(i)
+  for (let i = playSingleCardRoundTwice ? 1 : 2; i <= maxCards; i += 1) rounds.push(i)
   return rounds
 }
 
@@ -29,10 +30,10 @@ function getDealerForRound(players, roundIndex) {
   return players[roundIndex % players.length]
 }
 
-function createGameEntries(players, maxCards) {
+function createGameEntries(players, maxCards, options = {}) {
   ensurePlayers(players)
 
-  return createCardSequence(maxCards).map((cards, roundIndex) => ({
+  return createCardSequence(maxCards, options).map((cards, roundIndex) => ({
     cards,
     dealer: getDealerForRound(players, roundIndex),
     bids: {},

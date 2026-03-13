@@ -6,6 +6,7 @@ const SCORING_METHODS = {
 const DEFAULT_RULES = {
   scoringMethod: SCORING_METHODS.CLASSIC,
   screwTheDealer: false,
+  playSingleCardRoundTwice: false,
 }
 
 const DEFAULT_SCORING_CONFIG = {
@@ -28,6 +29,7 @@ function normalizeRules(rules = DEFAULT_RULES) {
   return {
     scoringMethod,
     screwTheDealer: Boolean(rules.screwTheDealer),
+    playSingleCardRoundTwice: Boolean(rules.playSingleCardRoundTwice),
   }
 }
 
@@ -81,7 +83,7 @@ function calculatePlayerRoundScore({
   return -(delta * config.exactBonus)
 }
 
-function isRoundComplete({ players, bids, tricks }) {
+function isRoundComplete({ players, bids, tricks, cards }) {
   if (!Array.isArray(players) || players.length === 0) {
     return false
   }
@@ -90,7 +92,7 @@ function isRoundComplete({ players, bids, tricks }) {
     return false
   }
 
-  return players.every(
+  const allValuesRecorded = players.every(
     (player) =>
       Object.prototype.hasOwnProperty.call(bids, player) &&
       Object.prototype.hasOwnProperty.call(tricks, player) &&
@@ -99,6 +101,17 @@ function isRoundComplete({ players, bids, tricks }) {
       typeof tricks[player] === 'number' &&
       !Number.isNaN(tricks[player])
   )
+
+  if (!allValuesRecorded) {
+    return false
+  }
+
+  if (typeof cards !== 'number' || Number.isNaN(cards)) {
+    return true
+  }
+
+  const totalTricks = players.reduce((sum, player) => sum + tricks[player], 0)
+  return totalTricks === cards
 }
 
 function calculateRoundScores({
@@ -189,7 +202,7 @@ function buildScoreboardProgress({
   let totals = {}
 
   rounds.forEach((round, roundIndex) => {
-    if (!isRoundComplete({ players, bids: round.bids, tricks: round.tricks })) {
+    if (!isRoundComplete({ players, bids: round.bids, tricks: round.tricks, cards: round.cards })) {
       results.push({
         round: roundIndex + 1,
         complete: false,

@@ -21,6 +21,9 @@ export default function RulesPage() {
   )
   const [scoringMethod, setScoringMethod] = useState(game?.rules?.scoringMethod || 'classic')
   const [screwTheDealer, setScrewTheDealer] = useState(Boolean(game?.rules?.screwTheDealer))
+  const [playSingleCardRoundTwice, setPlaySingleCardRoundTwice] = useState(
+    Boolean(game?.rules?.playSingleCardRoundTwice)
+  )
   const [error, setError] = useState('')
 
   const startGame = () => {
@@ -44,8 +47,11 @@ export default function RulesPage() {
       rules: {
         scoringMethod,
         screwTheDealer,
+        playSingleCardRoundTwice,
       },
-      entries: createGameEntries(game.names, game.maxCards),
+      entries: createGameEntries(game.names, game.maxCards, {
+        playSingleCardRoundTwice,
+      }),
     }
 
     window.localStorage.setItem('ohsa-game', JSON.stringify(nextGame))
@@ -104,6 +110,30 @@ export default function RulesPage() {
                   </span>
                 </div>
                 <span>When all bids are entered, total bids cannot equal cards dealt in that round.</span>
+              </button>
+            </div>
+
+            <div>
+              <p className="eyebrow">Rounds</p>
+              <button
+                type="button"
+                className={
+                  playSingleCardRoundTwice ? 'choiceCard toggleCard active' : 'choiceCard toggleCard'
+                }
+                disabled={hasStartedGame}
+                onClick={() => setPlaySingleCardRoundTwice((current) => !current)}
+              >
+                <div className="row split">
+                  <strong>Play 1-card round twice</strong>
+                  <span className={playSingleCardRoundTwice ? 'togglePill on' : 'togglePill'}>
+                    {playSingleCardRoundTwice ? 'On' : 'Off'}
+                  </span>
+                </div>
+                <span>
+                  {playSingleCardRoundTwice
+                    ? 'Sequence example: 3 2 1 1 2 3'
+                    : 'Sequence example: 3 2 1 2 3'}
+                </span>
               </button>
             </div>
           </section>

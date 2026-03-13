@@ -7,6 +7,10 @@ test('createCardSequence builds a down and up round order', () => {
   assert.deepEqual(createCardSequence(4), [4, 3, 2, 1, 2, 3, 4])
 })
 
+test('createCardSequence can include the one-card round twice', () => {
+  assert.deepEqual(createCardSequence(3, { playSingleCardRoundTwice: true }), [3, 2, 1, 1, 2, 3])
+})
+
 test('getDealerForRound rotates by player order', () => {
   const players = ['Ava', 'Bo', 'Cy']
   assert.equal(getDealerForRound(players, 0), 'Ava')
@@ -27,5 +31,14 @@ test('createGameEntries includes cards and dealer metadata', () => {
       { cards: 2, dealer: 'Bo' },
       { cards: 3, dealer: 'Ava' },
     ]
+  )
+})
+
+test('createGameEntries respects the double one-card round option', () => {
+  const entries = createGameEntries(['Ava', 'Bo'], 3, { playSingleCardRoundTwice: true })
+
+  assert.deepEqual(
+    entries.map((entry) => entry.cards),
+    [3, 2, 1, 1, 2, 3]
   )
 })
