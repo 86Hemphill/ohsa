@@ -67,6 +67,12 @@ function formatOverUnder(value) {
   return 'Even'
 }
 
+function getBidDeltaLabel(value) {
+  if (value > 0) return `Over Bid (+${value})`
+  if (value < 0) return `Under Bid (${value})`
+  return 'Even Bid'
+}
+
 function getExactBidStats(players, entries) {
   return players.map((name) => {
     let exact = 0
@@ -491,8 +497,8 @@ export default function ScoreboardPage() {
                                   <strong>{got}</strong>
                                 </div>
                                 <div className="scoreMeta">
-                                  <span className="controlLabel">Over/Under</span>
-                                  <strong>{formatOverUnder(diff)}</strong>
+                                  <span className="controlLabel">Bid Delta</span>
+                                  <strong>{getBidDeltaLabel(diff)}</strong>
                                 </div>
                               </div>
                               <div className="playerRoundScores">
@@ -583,7 +589,7 @@ export default function ScoreboardPage() {
                       {isActiveRound && !gameFinished ? (
                         <>
                           <span>Bid {bidTotal}</span>
-                          <span>Over/Under {formatOverUnder(overUnderTotal)}</span>
+                          {roundPhase === 'playing' ? <span>{getBidDeltaLabel(overUnderTotal)}</span> : null}
                         </>
                       ) : null}
                     </div>
