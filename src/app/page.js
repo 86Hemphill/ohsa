@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import HomeActions from './home-actions'
-import ohHellArt from '../images/ohHell.jpg'
+import ohHellArt from './logo.png'
 
 export default function HomePage() {
   return (
