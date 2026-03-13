@@ -35,9 +35,7 @@ function getBidOrder(players, dealer) {
   const dealerIndex = players.indexOf(dealer)
   if (dealerIndex === -1) return players
 
-  return players
-    .slice(dealerIndex + 1)
-    .concat(players.slice(0, dealerIndex + 1))
+  return players.slice(dealerIndex + 1).concat(players.slice(0, dealerIndex + 1))
 }
 
 function getNextBidder(entry, players) {
@@ -58,14 +56,13 @@ function getPlacings(players, totals) {
     return {
       name,
       score,
-      rank,
       label: getOrdinal(rank),
     }
   })
 }
 
-function getRoundState(entry, players, roundProgress) {
-  if (roundProgress.complete) return 'complete'
+function getRoundState(entry, players, progress) {
+  if (progress.complete) return 'complete'
   const hasAnyInput = players.some(
     (player) => hasRecordedValue(entry, 'bids', player) || hasRecordedValue(entry, 'tricks', player)
   )
@@ -136,7 +133,7 @@ export default function ScoreboardPage() {
     ? game.names.reduce((sum, name) => sum + toNumber(activeRound.tricks?.[name]), 0)
     : 0
   const nextBidder = activeRound ? getNextBidder(activeRound, game.names) : null
-  const currentRoundPlacement = getPlacings(game.names, board.totals)
+  const placings = getPlacings(game.names, board.totals)
   const dealerRestrictedBid =
     activeRound && rules.screwTheDealer && nextBidder === activeRound.dealer
       ? activeRound.cards -
@@ -160,7 +157,7 @@ export default function ScoreboardPage() {
       round.cards > 1 &&
       game.names.filter((name) => name !== player).every((name) => !hasRecordedValue(round, 'bids', name))
     ) {
-      setWarning(`The dealer bids last unless it is a one-card round.`)
+      setWarning('The dealer bids last unless it is a one-card round.')
       return
     }
 
@@ -208,21 +205,28 @@ export default function ScoreboardPage() {
 
   return (
     <main className="screen wide">
-      <div className="stack wideStack">
-        <div className="panel stack compact">
+      <div className="stack wideStack scoreboardShell">
+        <section className="panel scoreboardSummary">
           <div className="row split">
-            <div>
-              <p className="eyebrow">Game in progress</p>
-              <h2>Scoreboard</h2>
-              {activeRound ? (
-                <p className="muted">
-                  Round {activeRoundIndex + 1} of {entries.length} - {activeRound.cards} cards
-                </p>
-              ) : null}
-              <p className="muted">
-                {rules.scoringMethod === 'competitive' ? 'Competitive Scoring' : 'Classic Scoring'}
-              </p>
-              <p className="muted">Screw the Dealer is {rules.screwTheDealer ? 'On' : 'Off'}</p>
+            <div className="stack compact">
+              <div>
+                <p className="eyebrow">Game in progress</p>
+                <h2>Scoreboard</h2>
+                {activeRound ? (
+                  <p className="muted">
+                    Round {activeRoundIndex + 1} of {entries.length} · {activeRound.cards} cards
+                  </p>
+                ) : null}
+              </div>
+              <div className="ruleList">
+                <span className="ruleChip">
+                  {rules.scoringMethod === 'competitive' ? 'Competitive Scoring' : 'Classic Scoring'}
+                </span>
+                <span className="ruleChip">Screw the Dealer: {rules.screwTheDealer ? 'On' : 'Off'}</span>
+                <span className="ruleChip">
+                  1-card round twice: {rules.playSingleCardRoundTwice ? 'On' : 'Off'}
+                </span>
+              </div>
             </div>
             <div className="row wrap">
               <Link href="/rules" className="button secondary">
@@ -236,12 +240,9 @@ export default function ScoreboardPage() {
               </button>
             </div>
           </div>
+
           {activeRound ? (
             <div className="statusGrid">
-              <div className="statusCard">
-                <span className="statusLabel">Active round</span>
-                <strong>Round {activeRoundIndex + 1}</strong>
-              </div>
               <div className="statusCard">
                 <span className="statusLabel">Dealer</span>
                 <strong>{activeRound.dealer}</strong>
@@ -262,97 +263,95 @@ export default function ScoreboardPage() {
               </div>
             </div>
           ) : null}
-          {warning ? <p className="error">{warning}</p> : null}
-        </div>
-      </div>
-      <div className="scoreboardWrap">
-        <table className="scoreboard">
-          <thead>
-            <tr>
-              <th className="stickyLeft">Round</th>
-              {game.names.map((name) => (
-                <th key={name}>{name}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {entries.map((entry, roundIndex) => {
-              const roundState = getRoundState(entry, game.names, board.rounds[roundIndex])
-              const activeRowNote =
-                roundIndex === activeRoundIndex
-                  ? dealerRestrictedBid !== null && dealerRestrictedBid >= 0
-                    ? `Dealer can't say ${dealerRestrictedBid}`
-                    : gotTotal !== entry.cards
-                      ? `Got total must equal ${entry.cards}`
-                      : null
-                  : null
 
-              return (
-                <tr key={`${entry.cards}-${roundIndex}`}>
-                  <td className={`stickyLeft roundStateCell ${roundState}`}>
-                    <div className="roundMeta">
-                      <strong>{entry.cards} cards</strong>
-                      <span className="muted smallText">Dealer: {entry.dealer}</span>
-                      {activeRowNote ? <span className="roundNote">{activeRowNote}</span> : null}
-                      <span className={`roundStateIndicator ${roundState}`} />
-                    </div>
-                  </td>
+          <div className="standingsStrip">
+            {placings.map((entry) => (
+              <div key={entry.name} className="standingCard">
+                <span className="standingPlace">{entry.label}</span>
+                <strong>{entry.name}</strong>
+                <span>{entry.score}</span>
+              </div>
+            ))}
+          </div>
+
+          {warning ? <p className="error">{warning}</p> : null}
+        </section>
+
+        <section className="roundList">
+          {entries.map((entry, roundIndex) => {
+            const roundProgress = board.rounds[roundIndex]
+            const roundState = getRoundState(entry, game.names, roundProgress)
+            const isActiveRound = roundIndex === activeRoundIndex
+            const rowNote =
+              isActiveRound && dealerRestrictedBid !== null && dealerRestrictedBid >= 0
+                ? `Dealer can't say ${dealerRestrictedBid}`
+                : null
+
+            return (
+              <article key={`${entry.cards}-${roundIndex}`} className={`roundCard ${roundState}`}>
+                <div className="roundCardHeader">
+                  <div>
+                    <p className="eyebrow">Round {roundIndex + 1}</p>
+                    <h3>{entry.cards} cards</h3>
+                    <p className="muted">Dealer: {entry.dealer}</p>
+                  </div>
+                  <div className="roundHeaderSide">
+                    <span className={`roundStatePill ${roundState}`}>
+                      {roundState === 'complete' ? 'Complete' : roundState === 'active' ? 'Current' : 'Upcoming'}
+                    </span>
+                    {rowNote ? <span className="roundNote">{rowNote}</span> : null}
+                  </div>
+                </div>
+
+                <div className="roundRows">
                   {game.names.map((name) => {
                     const max = entry.cards
                     const bid = toNumber(entry.bids?.[name])
                     const got = toNumber(entry.tricks?.[name])
                     const isDealer = entry.dealer === name
-                    const roundScore = board.rounds[roundIndex].scores?.[name]?.roundScore
-                    const runningTotal = board.rounds[roundIndex].totals?.[name]
-                    const isNextBidder = roundIndex === activeRoundIndex && nextBidder === name
+                    const roundScore = roundProgress.scores?.[name]?.roundScore
+                    const runningTotal = roundProgress.totals?.[name] ?? board.totals[name] ?? 0
+                    const isNextBidder = isActiveRound && nextBidder === name
 
                     return (
-                      <td
-                        key={`${name}-${roundIndex}`}
-                        className={isNextBidder ? 'activeBidderCell' : undefined}
-                      >
-                        <div className="cellControl">
-                          <span>{isDealer ? 'Bid (D):' : 'Bid:'} {bid}</span>
-                          <div>
+                      <div key={`${name}-${roundIndex}`} className={`playerRoundRow ${isNextBidder ? 'next' : ''}`}>
+                        <div className="playerRoundIdentity">
+                          <strong>{name}</strong>
+                          {isDealer ? <span className="dealerTag">Dealer</span> : null}
+                          {isNextBidder ? <span className="turnHint">Next bid</span> : null}
+                        </div>
+                        <div className="controlCluster">
+                          <span className="controlLabel">Bid</span>
+                          <div className="stepper">
                             <button onClick={() => setValue(roundIndex, name, 'bids', -1, max)}>-</button>
+                            <strong>{bid}</strong>
                             <button onClick={() => setValue(roundIndex, name, 'bids', 1, max)}>+</button>
                           </div>
-                          <span>Got: {got}</span>
-                          <div>
+                        </div>
+                        <div className="controlCluster">
+                          <span className="controlLabel">Got</span>
+                          <div className="stepper">
                             <button onClick={() => setValue(roundIndex, name, 'tricks', -1, max)}>-</button>
+                            <strong>{got}</strong>
                             <button onClick={() => setValue(roundIndex, name, 'tricks', 1, max)}>+</button>
                           </div>
-                          <strong>{roundScore === undefined ? '-' : formatSignedScore(roundScore)}</strong>
-                          <span className="runningTotal">
-                            Total: {runningTotal === undefined ? board.totals[name] || 0 : runningTotal}
-                          </span>
-                          {isNextBidder ? <span className="turnHint">Next to bid</span> : null}
                         </div>
-                      </td>
+                        <div className="scoreMeta">
+                          <span className="controlLabel">Round</span>
+                          <strong>{roundScore === undefined ? '-' : formatSignedScore(roundScore)}</strong>
+                        </div>
+                        <div className="scoreMeta">
+                          <span className="controlLabel">Total</span>
+                          <strong>{runningTotal}</strong>
+                        </div>
+                      </div>
                     )
                   })}
-                </tr>
-              )
-            })}
-          </tbody>
-          <tfoot>
-            <tr>
-              <th className="stickyLeft">Final</th>
-              {game.names.map((name) => {
-                const placing = currentRoundPlacement.find((entry) => entry.name === name)
-                return (
-                  <th key={`total-${name}`}>
-                    <div className="totalSummary">
-                      <span>{name}</span>
-                      <strong>{board.totals[name] || 0}</strong>
-                      <span className="totalPlace">{placing?.label || '-'}</span>
-                    </div>
-                  </th>
-                )
-              })}
-            </tr>
-          </tfoot>
-        </table>
+                </div>
+              </article>
+            )
+          })}
+        </section>
       </div>
     </main>
   )
