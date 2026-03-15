@@ -692,6 +692,22 @@ export default function ScoreboardPage() {
   return (
     <main className="screen wide">
       <div className="stack wideStack scoreboardShell">
+        {showWakeLockControl ? (
+          <section className="panel scoreboardQuickActions">
+            <div className="ruleList">
+              <button
+                type="button"
+                className={`ruleChip ruleChipButton ${wakeLockStatus === 'active' ? 'active' : ''}`}
+                onClick={toggleWakeLock}
+              >
+                {wakeLockStatus === 'active' ? 'Keep Screen On: On' : 'Keep Screen On: Off'}
+              </button>
+            </div>
+
+            {wakeLockMessage ? <p className="muted smallText">{wakeLockMessage}</p> : null}
+          </section>
+        ) : null}
+
         <section className="roundList">
           {entries.map((entry, roundIndex) => {
             const roundProgress = board.rounds[roundIndex]
@@ -869,18 +885,7 @@ export default function ScoreboardPage() {
             </span>
             <span className="ruleChip">Screw the Dealer: {rules.screwTheDealer ? 'On' : 'Off'}</span>
             <span className="ruleChip">1-card round twice: {rules.playSingleCardRoundTwice ? 'On' : 'Off'}</span>
-            {showWakeLockControl ? (
-              <button
-                type="button"
-                className={`ruleChip ruleChipButton ${wakeLockStatus === 'active' ? 'active' : ''}`}
-                onClick={toggleWakeLock}
-              >
-                {wakeLockStatus === 'active' ? 'Keep Screen On: On' : 'Keep Screen On: Off'}
-              </button>
-            ) : null}
           </div>
-
-          {showWakeLockControl && wakeLockMessage ? <p className="muted smallText">{wakeLockMessage}</p> : null}
 
           <div className="standingsStrip">
             {placings.map((entry) => (

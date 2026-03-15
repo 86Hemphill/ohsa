@@ -135,6 +135,11 @@ p {
   gap: 1rem;
 }
 
+.scoreboardQuickActions {
+  display: grid;
+  gap: 0.45rem;
+}
+
 .resultsHero {
   display: grid;
   gap: 0.85rem;
