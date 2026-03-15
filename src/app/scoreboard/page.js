@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import scoring from '../../game/scoring'
@@ -128,6 +128,11 @@ export default function ScoreboardPage() {
   const [warning, setWarning] = useState('')
   const [expandedRounds, setExpandedRounds] = useState({})
   const [editingRounds, setEditingRounds] = useState({})
+  const [showWakeLockControl, setShowWakeLockControl] = useState(false)
+  const [wakeLockStatus, setWakeLockStatus] = useState('idle')
+  const [wakeLockMessage, setWakeLockMessage] = useState('')
+  const wakeLockRef = useRef(null)
+  const keepAwakeRequestedRef = useRef(false)
 
   const game = useMemo(() => {
     if (typeof window === 'undefined') return null
@@ -233,6 +238,110 @@ export default function ScoreboardPage() {
     window.localStorage.setItem('ohsa-game', JSON.stringify(clone))
     setVersion((v) => v + 1)
   }, [activeRoundIndex, game, gameFinished])
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || typeof navigator === 'undefined') return undefined
+
+    const mediaQuery = window.matchMedia('(max-width: 900px), (pointer: coarse)')
+
+    const updateWakeLockVisibility = () => {
+      const isTouchDevice = navigator.maxTouchPoints > 0
+      setShowWakeLockControl(mediaQuery.matches || isTouchDevice)
+    }
+
+    updateWakeLockVisibility()
+    mediaQuery.addEventListener('change', updateWakeLockVisibility)
+
+    return () => {
+      mediaQuery.removeEventListener('change', updateWakeLockVisibility)
+    }
+  }, [])
+
+  const releaseWakeLock = async () => {
+    keepAwakeRequestedRef.current = false
+
+    if (!wakeLockRef.current) {
+      setWakeLockStatus('idle')
+      setWakeLockMessage('')
+      return
+    }
+
+    const sentinel = wakeLockRef.current
+    wakeLockRef.current = null
+
+    try {
+      await sentinel.release()
+    } catch {
+      // Ignore release errors and clear the local state either way.
+    }
+
+    setWakeLockStatus('idle')
+    setWakeLockMessage('')
+  }
+
+  const requestWakeLock = async () => {
+    if (typeof navigator === 'undefined' || typeof document === 'undefined') return
+
+    if (!('wakeLock' in navigator) || typeof navigator.wakeLock?.request !== 'function') {
+      keepAwakeRequestedRef.current = false
+      setWakeLockStatus('unsupported')
+      setWakeLockMessage('Keep-awake is not available in this browser.')
+      return
+    }
+
+    keepAwakeRequestedRef.current = true
+
+    try {
+      const sentinel = await navigator.wakeLock.request('screen')
+      wakeLockRef.current = sentinel
+      setWakeLockStatus('active')
+      setWakeLockMessage('Screen will stay awake while this scoreboard is open.')
+
+      sentinel.addEventListener('release', () => {
+        wakeLockRef.current = null
+
+        if (keepAwakeRequestedRef.current && document.visibilityState === 'visible') {
+          requestWakeLock()
+          return
+        }
+
+        setWakeLockStatus('idle')
+        setWakeLockMessage('')
+      })
+    } catch (error) {
+      keepAwakeRequestedRef.current = false
+      setWakeLockStatus('error')
+      setWakeLockMessage(error?.message || 'Could not keep the screen awake right now.')
+    }
+  }
+
+  useEffect(() => {
+    if (typeof document === 'undefined') return undefined
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState !== 'visible' || !keepAwakeRequestedRef.current || wakeLockRef.current) return
+      requestWakeLock()
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+      if (wakeLockRef.current) {
+        wakeLockRef.current.release().catch(() => {})
+        wakeLockRef.current = null
+      }
+    }
+  }, [])
+
+  const toggleWakeLock = async () => {
+    if (wakeLockRef.current || keepAwakeRequestedRef.current) {
+      await releaseWakeLock()
+      return
+    }
+
+    await requestWakeLock()
+  }
 
   const setValue = (roundIndex, player, field, delta, maxForRound) => {
     if (gameFinished && !editingRounds[roundIndex]) {
@@ -760,7 +869,18 @@ export default function ScoreboardPage() {
             </span>
             <span className="ruleChip">Screw the Dealer: {rules.screwTheDealer ? 'On' : 'Off'}</span>
             <span className="ruleChip">1-card round twice: {rules.playSingleCardRoundTwice ? 'On' : 'Off'}</span>
+            {showWakeLockControl ? (
+              <button
+                type="button"
+                className={`ruleChip ruleChipButton ${wakeLockStatus === 'active' ? 'active' : ''}`}
+                onClick={toggleWakeLock}
+              >
+                {wakeLockStatus === 'active' ? 'Keep Screen On: On' : 'Keep Screen On: Off'}
+              </button>
+            ) : null}
           </div>
+
+          {showWakeLockControl && wakeLockMessage ? <p className="muted smallText">{wakeLockMessage}</p> : null}
 
           <div className="standingsStrip">
             {placings.map((entry) => (

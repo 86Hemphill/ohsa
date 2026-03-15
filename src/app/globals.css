@@ -523,6 +523,17 @@ p {
   font-size: 0.84rem;
 }
 
+.ruleChipButton {
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.ruleChipButton.active {
+  background: rgba(53, 184, 166, 0.2);
+  border-color: rgba(101, 221, 199, 0.42);
+  color: #b9fff4;
+}
+
 .standingsStrip {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
